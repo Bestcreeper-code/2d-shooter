@@ -1,0 +1,211 @@
+[
+  {
+    "file": "src/Entities/Player/Player.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-O0",
+      "-g",
+      "-Wall",
+      "-Werror",
+      "-Ilibs/box2D/include",
+      "-Ilibs/raylib/src",
+      "-Isrc",
+      "-c",
+      "src/Entities/Player/Player.cpp",
+      "-o",
+      "build/src/Entities/Player/Player.o"
+    ],
+    "directory": "/home/bestcreeper/Code/Games/2d-shooter",
+    "output": "build/src/Entities/Player/Player.o"
+  },
+  {
+    "file": "src/Entities/TestEnemy/TestEnemy.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-O0",
+      "-g",
+      "-Wall",
+      "-Werror",
+      "-Ilibs/box2D/include",
+      "-Ilibs/raylib/src",
+      "-Isrc",
+      "-c",
+      "src/Entities/TestEnemy/TestEnemy.cpp",
+      "-o",
+      "build/src/Entities/TestEnemy/TestEnemy.o"
+    ],
+    "directory": "/home/bestcreeper/Code/Games/2d-shooter",
+    "output": "build/src/Entities/TestEnemy/TestEnemy.o"
+  },
+  {
+    "file": "src/Entities/Bonuses/HealthPack.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-O0",
+      "-g",
+      "-Wall",
+      "-Werror",
+      "-Ilibs/box2D/include",
+      "-Ilibs/raylib/src",
+      "-Isrc",
+      "-c",
+      "src/Entities/Bonuses/HealthPack.cpp",
+      "-o",
+      "build/src/Entities/Bonuses/HealthPack.o"
+    ],
+    "directory": "/home/bestcreeper/Code/Games/2d-shooter",
+    "output": "build/src/Entities/Bonuses/HealthPack.o"
+  },
+  {
+    "file": "src/Platforms/Wall/Wall.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-O0",
+      "-g",
+      "-Wall",
+      "-Werror",
+      "-Ilibs/box2D/include",
+      "-Ilibs/raylib/src",
+      "-Isrc",
+      "-c",
+      "src/Platforms/Wall/Wall.cpp",
+      "-o",
+      "build/src/Platforms/Wall/Wall.o"
+    ],
+    "directory": "/home/bestcreeper/Code/Games/2d-shooter",
+    "output": "build/src/Platforms/Wall/Wall.o"
+  },
+  {
+    "file": "src/Bullets/Bullet.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-O0",
+      "-g",
+      "-Wall",
+      "-Werror",
+      "-Ilibs/box2D/include",
+      "-Ilibs/raylib/src",
+      "-Isrc",
+      "-c",
+      "src/Bullets/Bullet.cpp",
+      "-o",
+      "build/src/Bullets/Bullet.o"
+    ],
+    "directory": "/home/bestcreeper/Code/Games/2d-shooter",
+    "output": "build/src/Bullets/Bullet.o"
+  },
+  {
+    "file": "src/Debug/Debug.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-O0",
+      "-g",
+      "-Wall",
+      "-Werror",
+      "-Ilibs/box2D/include",
+      "-Ilibs/raylib/src",
+      "-Isrc",
+      "-c",
+      "src/Debug/Debug.cpp",
+      "-o",
+      "build/src/Debug/Debug.o"
+    ],
+    "directory": "/home/bestcreeper/Code/Games/2d-shooter",
+    "output": "build/src/Debug/Debug.o"
+  },
+  {
+    "file": "src/ObjectMgr/ObjectMgr.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-O0",
+      "-g",
+      "-Wall",
+      "-Werror",
+      "-Ilibs/box2D/include",
+      "-Ilibs/raylib/src",
+      "-Isrc",
+      "-c",
+      "src/ObjectMgr/ObjectMgr.cpp",
+      "-o",
+      "build/src/ObjectMgr/ObjectMgr.o"
+    ],
+    "directory": "/home/bestcreeper/Code/Games/2d-shooter",
+    "output": "build/src/ObjectMgr/ObjectMgr.o"
+  },
+  {
+    "file": "src/Object/Object.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-O0",
+      "-g",
+      "-Wall",
+      "-Werror",
+      "-Ilibs/box2D/include",
+      "-Ilibs/raylib/src",
+      "-Isrc",
+      "-c",
+      "src/Object/Object.cpp",
+      "-o",
+      "build/src/Object/Object.o"
+    ],
+    "directory": "/home/bestcreeper/Code/Games/2d-shooter",
+    "output": "build/src/Object/Object.o"
+  },
+  {
+    "file": "src/main.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-O0",
+      "-g",
+      "-Wall",
+      "-Werror",
+      "-Ilibs/box2D/include",
+      "-Ilibs/raylib/src",
+      "-Isrc",
+      "-c",
+      "src/main.cpp",
+      "-o",
+      "build/src/main.o"
+    ],
+    "directory": "/home/bestcreeper/Code/Games/2d-shooter",
+    "output": "build/src/main.o"
+  },
+  {
+    "file": "src/Collision/Collisions.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-O0",
+      "-g",
+      "-Wall",
+      "-Werror",
+      "-Ilibs/box2D/include",
+      "-Ilibs/raylib/src",
+      "-Isrc",
+      "-c",
+      "src/Collision/Collisions.cpp",
+      "-o",
+      "build/src/Collision/Collisions.o"
+    ],
+    "directory": "/home/bestcreeper/Code/Games/2d-shooter",
+    "output": "build/src/Collision/Collisions.o"
+  },
+  {
+    "file": "src/Textures/TextureCache.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-O0",
+      "-g",
+      "-Wall",
+      "-Werror",
+      "-Ilibs/box2D/include",
+      "-Ilibs/raylib/src",
+      "-Isrc",
+      "-c",
+      "src/Textures/TextureCache.cpp",
+      "-o",
+      "build/src/Textures/TextureCache.o"
+    ],
+    "directory": "/home/bestcreeper/Code/Games/2d-shooter",
+    "output": "build/src/Textures/TextureCache.o"
+  }
+]

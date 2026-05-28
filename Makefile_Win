@@ -1,0 +1,79 @@
+CXX      := x86_64-w64-mingw32-g++
+ELF      := Game.exe
+OBJ_DIR  := build
+
+SYSROOT  := /usr/x86_64-w64-mingw32
+
+BOX2D_LIB  := libs/box2D/build/src/libbox2d.a
+RAYLIB_LIB := libs/raylib/src/libraylib.a
+
+LIBS := $(BOX2D_LIB) $(RAYLIB_LIB) \
+        -static \
+        -lgdi32 -lwinmm -lm -lpthread \
+        -lstdc++ -lgcc -lgcc_eh -lgcc_s
+
+CXX_SRCS := $(shell find src -name "*.cpp" -type f)
+CXX_OBJS := $(CXX_SRCS:src/%.cpp=$(OBJ_DIR)/src/%.o)
+
+INCLUDES := \
+    -nostdinc++ \
+    -I$(SYSROOT)/include/c++/16.1.0 \
+    -I$(SYSROOT)/include/c++/16.1.0/x86_64-w64-mingw32 \
+    -I$(SYSROOT)/include \
+    -Ilibs/box2D/include \
+    -Ilibs/raylib/src \
+    -Isrc
+
+LDFLAGS := -L$(SYSROOT)/lib
+
+CXXFLAGS_DEBUG   := -O0 -g -Wall -Werror
+CXXFLAGS_RELEASE := -Os -s -fdata-sections -ffunction-sections -Wall -Werror
+
+.PHONY: all debug release clean clean-all
+
+all: debug
+
+debug:   CXXFLAGS := $(CXXFLAGS_DEBUG)
+debug:   $(ELF)
+
+release: CXXFLAGS := $(CXXFLAGS_RELEASE)
+release: $(ELF)
+
+$(BOX2D_LIB):
+	@echo "Building Box2D (MinGW cross)"
+	rm -rf libs/box2D/build
+	cmake -S libs/box2D -B libs/box2D/build \
+	    -DCMAKE_SYSTEM_NAME=Windows \
+	    -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc \
+	    -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++ \
+	    -DCMAKE_RC_COMPILER=x86_64-w64-mingw32-windres \
+	    -DCMAKE_SYSROOT=/usr/x86_64-w64-mingw32 \
+	    -DCMAKE_FIND_ROOT_PATH=/usr/x86_64-w64-mingw32 \
+	    -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \
+	    -DCMAKE_BUILD_TYPE=Release \
+	    -DBOX2D_BUILD_TESTBED=OFF \
+	    -DBOX2D_BUILD_UNIT_TESTS=OFF \
+	    -DBOX2D_SAMPLES=OFF
+	cmake --build libs/box2D/build -- -j4
+
+$(RAYLIB_LIB):
+	@echo "Building Raylib (MinGW cross)"
+	$(MAKE) -C libs/raylib/src -j4 \
+	    CC=x86_64-w64-mingw32-gcc \
+	    OS=Windows_NT \
+	    PLATFORM=PLATFORM_DESKTOP
+
+$(ELF): $(BOX2D_LIB) $(RAYLIB_LIB) $(CXX_OBJS)
+	$(CXX) $(LDFLAGS) $(CXX_OBJS) -o $@ $(LIBS)
+
+$(OBJ_DIR)/src/%.o: src/%.cpp
+	@mkdir -p $(dir $@)
+	@echo "Compiling $< -> $@"
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
+
+clean:
+	rm -rf $(OBJ_DIR) $(ELF)
+
+clean-all: clean
+	rm -rf libs/box2D/build
+	$(MAKE) -C libs/raylib/src clean
