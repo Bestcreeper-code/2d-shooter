@@ -1,0 +1,6 @@
+[submodule "libs/raylib"]
+	path = libs/raylib
+	url = git@github.com:raysan5/raylib.git
+[submodule "libs/box2D"]
+	path = libs/box2D
+	url = https://github.com/erincatto/box2d.git
