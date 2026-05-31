@@ -37,6 +37,10 @@ Player::Player() : healthBar(30.0f, 10.0f) {
     b2Body_SetMassData(body.bodyId, massData); 
 }
 
+Player::~Player() {
+    DestroyBody(body);
+}
+
 
 void Player::Draw() {
     b2Transform t = b2Body_GetTransform(body.bodyId);
@@ -52,9 +56,7 @@ void Player::Draw() {
 
 float time_until_can_shoot = 0.0f;
 
-void Player::Update(){
-    
-    float deltaTime = GetFrameTime();
+void Player::Update(float deltaTime){
     
     b2Vec2 velocity = {0.0f, 0.0f};
     
@@ -77,7 +79,7 @@ void Player::Update(){
 
         b2Vec2 bulletPos = {M_2_PX(t.p.x), M_2_PX(t.p.y)-10};
         Bullet* bullet = new Bullet(true, bulletPos, 10.0f);
-        RegisterObject(bullet);
+        RegisterActor(bullet);
 
         time_until_can_shoot = shoot_cooldown;
     }
@@ -97,7 +99,7 @@ void Player::Update(){
     if (time_until_can_shoot > 0.0f) {
         time_until_can_shoot -= deltaTime;
     }
-    printf("hp: %f\n",health);
+    // printf("hp: %f\n",health);
 
     
 }
@@ -108,7 +110,10 @@ void Player::onCollision(PhysicsObject* other) {
         Bullet* bullet = dynamic_cast<Bullet*>(other);
         if (!bullet) return;
         health -= bullet->damage;
-        if(health<=0)StageDelete(this);
+        if(health<=0){
+            
+            StageDelete(this);
+        }
         was_hit_this_frame = true;
     }
 }

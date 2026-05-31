@@ -3,6 +3,9 @@
 #include "Object/Object.hpp"
 #include "box2d/box2d.h"
 #include "box2d/types.h"
+#include <cstdint>
+#include <cstdio>
+#include <unordered_set>
 
 
 
@@ -84,4 +87,18 @@ void ProcessCollisions() {
         a->onCollision(b);
         b->onCollision(a);
     }
+}
+
+static std::unordered_set<uintptr_t> destroyed;
+
+void DestroyBody(BodyResult body) {
+    if (!b2Body_IsValid(body.bodyId)) return;
+
+    if (!destroyed.insert((uintptr_t)&body.bodyId).second) {
+        printf("DOUBLE DESTROY DETECTED\n");
+        return;
+    }
+
+    b2Body_SetUserData(body.bodyId, nullptr);
+    b2DestroyBody(body.bodyId);
 }

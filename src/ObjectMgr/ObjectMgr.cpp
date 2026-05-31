@@ -1,41 +1,44 @@
 #include "ObjectMgr/ObjectMgr.hpp"
+#include "Object/Object.hpp"
 #include <algorithm>
 
 
 // main.cpp or ObjectManager.cpp
 
-std::vector<PhysicsObject*> physicsObjects;
+std::vector<Actor*> gameActors;
 
-void RegisterObject(PhysicsObject* obj) {
-    physicsObjects.push_back(obj);
+void RegisterActor(Actor* actor) {
+    gameActors.push_back(actor);
 }
 
 void UpdateAll() {
-    for (PhysicsObject* obj : physicsObjects) {
-        if (!obj)continue;
-        if (!obj->pendingDelete) {
-            obj->Update();
-        }
-        if (!obj->pendingDelete) {
-            obj->Draw();
-        }
+    float deltaTime = GetFrameTime();
+
+    size_t count = gameActors.size();
+
+    for (size_t i = 0; i < count; i++) {
+        Actor* actor = gameActors[i];
+        if (!actor) continue;
+        if (actor->pendingDelete) continue;
+
+        actor->Update(deltaTime);
+        actor->Draw();
     }
 }
 
-void StageDelete(PhysicsObject* obj) {
-    if (obj->pendingDelete) return;
-    obj->pendingDelete = true;
-    b2Body_SetUserData(obj->body.bodyId, nullptr);
-    b2DestroyBody(obj->body.bodyId);
+void StageDelete(Actor* actor) {
+    if (actor->pendingDelete) return;
+    actor->pendingDelete = true;
+    
 }
 
 void RemoveStaged() {
-    physicsObjects.erase(
-        std::remove_if(physicsObjects.begin(), physicsObjects.end(),
-            [](PhysicsObject* obj) {
-                if (obj->pendingDelete) { delete obj; return true; }
+    gameActors.erase(
+        std::remove_if(gameActors.begin(), gameActors.end(),
+            [](Actor* actor) {
+                if (actor->pendingDelete) { delete actor; return true; }
                 return false;
             }),
-        physicsObjects.end()
+        gameActors.end()
     );
 }

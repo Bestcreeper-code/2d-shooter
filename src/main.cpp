@@ -1,6 +1,7 @@
 #include "Collision/Collisions.hpp"
 #include "Entities/Bonuses/HealthPack.hpp"
-#include "Entities/TestEnemy/TestEnemy.hpp"
+#include "Entities/Enemies/EnemySpawner.hpp"
+#include "Entities/Enemies/TestEnemy/TestEnemy.hpp"
 #include "Object/Object.hpp"
 #include "ObjectMgr/ObjectMgr.hpp"
 #include "Platforms/Wall/Wall.hpp"
@@ -31,29 +32,24 @@ int main(int argc, char** argv)
 
     
     b2WorldDef worldDef = b2DefaultWorldDef();
-    worldDef.gravity = (b2Vec2){0.0f, 9.8f};
+    worldDef.gravity = (b2Vec2){0.0f, 0.0f};
     gWorld = b2CreateWorld(&worldDef);
 
     B2DebugDraw_Init();
     
-    physicsObjects.push_back(new Wall({0,-32}, WINDOW_WIDTH, 33));
-    physicsObjects.push_back(new Wall({-32,0}, 33,WINDOW_HEIGHT));
-    physicsObjects.push_back(new Wall({WINDOW_WIDTH+32,0}, 33,WINDOW_HEIGHT));
-    physicsObjects.push_back(new Wall({0,WINDOW_HEIGHT}, WINDOW_WIDTH, 33));
+    RegisterActor(new Wall({0,-32}, WINDOW_WIDTH, 33));
+    RegisterActor(new Wall({-32,0}, 33,WINDOW_HEIGHT));
+    RegisterActor(new Wall({WINDOW_WIDTH+32,0}, 33,WINDOW_HEIGHT));
+    RegisterActor(new Wall({0,WINDOW_HEIGHT}, WINDOW_WIDTH, 33));
     
     
-    physicsObjects.push_back(new TestEnemy());
-    physicsObjects.push_back(new TestEnemy());
-    physicsObjects.push_back(new TestEnemy());
-    physicsObjects.push_back(new TestEnemy());
-    physicsObjects.push_back(new TestEnemy());
-    physicsObjects.push_back(new TestEnemy());
-    physicsObjects.push_back(new TestEnemy());
+    RegisterActor(new TestEnemy((px_Vec2){300,30}));
 
-    physicsObjects.push_back(new Player());
+    RegisterActor(new Player());
 
-    physicsObjects.push_back(new HealthPack({200,200}, 25.0f));
+    RegisterActor(new HealthPack({200,200}, 25.0f));
     
+    RegisterActor(new EnemySpawner((px_Vec2){10,10},(px_Vec2){WINDOW_WIDTH - 10,70}));
 
 
 

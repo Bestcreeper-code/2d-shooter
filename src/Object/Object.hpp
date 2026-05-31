@@ -16,10 +16,19 @@ enum ObjectType : uint8_t {
     OBJ_TYPE_GROUND,
 };
 
-
-class PhysicsObject {
+class Actor {
     public:
         bool pendingDelete = false;
+
+        virtual void Update(float deltaTime) = 0;
+        virtual void Draw() {}
+        virtual ~Actor() = default;
+
+        
+};
+
+class PhysicsObject : public Actor {
+    public:
 
         virtual const ObjectType getType() = 0;
 
@@ -29,9 +38,7 @@ class PhysicsObject {
     
         
 
-        virtual void Draw() = 0;
 
-        virtual void Update() =0;
 
         virtual void onCollision(PhysicsObject* other) {}
 };

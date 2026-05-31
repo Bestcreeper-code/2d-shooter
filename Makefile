@@ -17,8 +17,12 @@ INCLUDES := -Ilibs/box2D/include -Ilibs/raylib/src -Isrc
 
  
 
-CXXFLAGS_DEBUG := -O0 -g -Wall -Werror
+CXXFLAGS_DEBUG := -O0 -g -Wall -Werror -fsanitize=address -g -fno-omit-frame-pointer
 CXXFLAGS_RELEASE := -Os -s -fdata-sections -ffunction-sections -Wall -Werror -g
+
+LDFLAGS_DEBUG := -fsanitize=address
+LDFLAGS_RELEASE := 
+
 
 
 
@@ -27,9 +31,11 @@ CXXFLAGS_RELEASE := -Os -s -fdata-sections -ffunction-sections -Wall -Werror -g
 all: debug
 
 debug: CXXFLAGS := $(CXXFLAGS_DEBUG)
+debug: LDFLAGS := $(LDFLAGS_DEBUG)
 debug: $(ELF)
 
 release: CXXFLAGS := $(CXXFLAGS_RELEASE)
+release: LDFLAGS := $(LDFLAGS_RELEASE)
 release: $(ELF)
 
 
@@ -46,7 +52,7 @@ $(RAYLIB_LIB):
 
 
 $(ELF): $(BOX2D_LIB) $(RAYLIB_LIB) $(CXX_OBJS)
-	$(CXX) $(CXX_OBJS) -o $@ $(LIBS)
+	$(CXX) $(CXX_OBJS) -o $@ $(LIBS) $(LDFLAGS)
 
 
 

@@ -3,9 +3,9 @@
 #include <vector>
 
 
-extern std::vector<PhysicsObject*> physicsObjects;
+extern std::vector<Actor*> gameActors;
 
-void RegisterObject(PhysicsObject* obj);
+void RegisterActor(Actor* obj);
 void UpdateAll();
-void StageDelete(PhysicsObject* obj);
+void StageDelete(Actor* obj);
 void RemoveStaged();

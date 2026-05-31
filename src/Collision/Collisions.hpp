@@ -39,3 +39,5 @@ BodyResult CreateBoxBody(void* ownerptr, b2WorldId worldId, b2Vec2 position,
     b2Filter collFilter);
 
 void ProcessCollisions();
+
+void DestroyBody(BodyResult body);

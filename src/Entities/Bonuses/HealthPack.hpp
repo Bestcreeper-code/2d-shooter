@@ -17,9 +17,10 @@ public:
     HealthPack(px_Vec2 position, float healing_amount) : Bonus(position, IMG_DIR"health_pack.png")  {
         this->heal_amount = healing_amount;
     }
+    ~HealthPack();
 
     void Draw()override;
-    void Update() override {}
+    void Update(float deltaTime) override {}
     void onCollision(PhysicsObject* other) override;
     
 };

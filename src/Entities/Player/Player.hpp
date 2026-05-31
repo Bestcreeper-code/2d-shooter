@@ -22,9 +22,10 @@ public:
 
     AnimatedSprite sprite;
     Player();
+    ~Player();
 
     
     void Draw() override;
-    void Update() override;
+    void Update(float deltaTime) override;
     void onCollision(PhysicsObject *other) override;
 };

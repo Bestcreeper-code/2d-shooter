@@ -47,13 +47,15 @@ Bullet::Bullet(bool isPlayerBullet, b2Vec2 position, float dmg) : isPlayerBullet
 }
 
 Bullet::~Bullet() {
-    // UnloadTexture(tex);
-    
+    DestroyBody(body);
 }
 
 
-void Bullet::Update() {
-    if (!b2Body_IsValid(body.bodyId)) { StageDelete(this); return; }
+void Bullet::Update(float deltaTime) {
+    if (!b2Body_IsValid(body.bodyId)) { 
+        DestroyBody(body);
+        StageDelete(this); return; 
+    }
     b2Vec2 velocity = {0.0f, isPlayerBullet ? -speed : speed};
     b2Body_SetLinearVelocity(body.bodyId, velocity);
 }
@@ -69,6 +71,7 @@ void Bullet::Draw() {
 void Bullet::onCollision(PhysicsObject* other){
     ObjectType otherType = other->getType();
     if (otherType == ObjectType::OBJ_TYPE_GROUND || otherType == (isPlayerBullet ? ObjectType::OBJ_TYPE_ENEMY : ObjectType::OBJ_TYPE_PLAYER)) {
+        DestroyBody(body);
         StageDelete(this);
     }
 }

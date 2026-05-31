@@ -1,5 +1,6 @@
 #include "HealthPack.hpp"
 #include "Bonus.hpp"
+#include "Collision/Collisions.hpp"
 #include "Entities/Player/Player.hpp"
 
 
@@ -15,4 +16,8 @@ void HealthPack::onCollision(PhysicsObject* other) {
         player->health = std::min(player->health + heal_amount, player->max_health);
         pendingDelete = true;
     }
+}
+
+HealthPack::~HealthPack() {
+    DestroyBody(body);
 }
