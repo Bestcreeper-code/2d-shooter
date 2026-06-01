@@ -94,7 +94,7 @@ static std::unordered_set<uintptr_t> destroyed;
 void DestroyBody(BodyResult body) {
     if (!b2Body_IsValid(body.bodyId)) return;
 
-    if (!destroyed.insert((uintptr_t)&body.bodyId).second) {
+    if (!destroyed.insert((uintptr_t)&body.bodyId.index1).second) {
         printf("DOUBLE DESTROY DETECTED\n");
         return;
     }

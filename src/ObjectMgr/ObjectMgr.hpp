@@ -9,3 +9,5 @@ void RegisterActor(Actor* obj);
 void UpdateAll();
 void StageDelete(Actor* obj);
 void RemoveStaged();
+
+void DeleteAllActors();

@@ -53,7 +53,7 @@ int main(int argc, char** argv)
 
 
 
-    SetTargetFPS(60);
+    SetTargetFPS(300);
 
     bool debug_on;
 
@@ -65,19 +65,22 @@ int main(int argc, char** argv)
 
         b2World_Step(gWorld, 1.0f / 60.0f, 4);
     
-        ProcessCollisions();
-        RemoveStaged();
-    
         BeginDrawing();
         ClearBackground(BLACK);
+        
+        
+        RemoveStaged();
 
+        ProcessCollisions();
+        
         UpdateAll();
-
+        
         if(debug_on)B2DebugDraw_Draw();
 
         EndDrawing();
     }
 
+    DeleteAllActors();
     
     b2DestroyWorld(gWorld);
 

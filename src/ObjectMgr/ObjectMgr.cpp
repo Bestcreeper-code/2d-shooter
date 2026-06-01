@@ -42,3 +42,9 @@ void RemoveStaged() {
         gameActors.end()
     );
 }
+
+void DeleteAllActors() {
+    for(Actor* actor : gameActors){
+        delete actor;
+    }
+}
