@@ -69,6 +69,6 @@ void Bullet::onCollision(PhysicsObject* other){
     ObjectType otherType = other->getType();
     if (otherType == ObjectType::OBJ_TYPE_GROUND || otherType == (isPlayerBullet ? ObjectType::OBJ_TYPE_ENEMY : ObjectType::OBJ_TYPE_PLAYER)) {
         
-        StageDelete(this);
+        StageDelete(actor_id);
     }
 }

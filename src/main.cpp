@@ -51,9 +51,10 @@ int main(int argc, char** argv)
     
     RegisterActor(new EnemySpawner((px_Vec2){10,10},(px_Vec2){WINDOW_WIDTH - 10,70}));
 
+    ProcessStagedActions();
 
 
-    SetTargetFPS(300);
+    SetTargetFPS(60);
 
     bool debug_on;
 
@@ -62,22 +63,21 @@ int main(int argc, char** argv)
         if (IsKeyPressed(GAME_KEY_DEBUG_TOGGLE)) {
             debug_on = !debug_on;
         }
-
+        
         b2World_Step(gWorld, 1.0f / 60.0f, 4);
-    
+        ProcessCollisions();
+        
         BeginDrawing();
         ClearBackground(BLACK);
-        
-        
-        RemoveStaged();
-
-        ProcessCollisions();
         
         UpdateAll();
         
         if(debug_on)B2DebugDraw_Draw();
-
+        
         EndDrawing();
+                
+        
+        ProcessStagedActions();
     }
 
     DeleteAllActors();

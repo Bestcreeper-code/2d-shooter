@@ -91,8 +91,7 @@ void TestEnemy::onCollision(PhysicsObject *other){
     if (other->getType() == ObjectType::OBJ_TYPE_PLAYER_BULLET) {
         health -= ((Bullet*)other)->damage;
         if(health <= 0) {
-            DestroyBody(body);
-            StageDelete(this);
+            StageDelete(actor_id);
         }
     }
 }

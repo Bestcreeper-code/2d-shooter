@@ -112,7 +112,7 @@ void Player::onCollision(PhysicsObject* other) {
         health -= bullet->damage;
         if(health<=0){
             
-            StageDelete(this);
+            StageDelete(actor_id);
         }
         was_hit_this_frame = true;
     }

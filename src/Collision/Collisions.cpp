@@ -100,5 +100,6 @@ void DestroyBody(BodyResult body) {
     }
 
     b2Body_SetUserData(body.bodyId, nullptr);
+    b2DestroyShape(body.shapeId, true);
     b2DestroyBody(body.bodyId);
 }

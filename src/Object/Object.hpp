@@ -1,6 +1,9 @@
 #pragma once
 
+class Actor;
+
 #include "Collision/Collisions.hpp"
+#include "ObjectMgr/ObjectMgr.hpp"
 #include "raylib.h"
 #include <cstdint>
 
@@ -18,6 +21,9 @@ enum ObjectType : uint8_t {
 
 class Actor {
     public:
+        ActorId* actor_id;
+
+
         bool pendingDelete = false;
 
         virtual void Update(float deltaTime) = 0;

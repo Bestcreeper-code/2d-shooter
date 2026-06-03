@@ -1,13 +1,23 @@
 #pragma once
+
+#include <cstdint>
+
+
+struct ActorId {
+    uint32_t index;
+    uint32_t generation;
+};
+
 #include "Object/Object.hpp"
 #include <vector>
 
 
-extern std::vector<Actor*> gameActors;
 
-void RegisterActor(Actor* obj);
+
+ActorId* RegisterActor(Actor* obj);
+Actor* GetActor(ActorId* id);
 void UpdateAll();
-void StageDelete(Actor* obj);
-void RemoveStaged();
+void StageDelete(ActorId* id);
+void ProcessStagedActions();
 
 void DeleteAllActors();
