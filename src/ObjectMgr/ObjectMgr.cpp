@@ -1,40 +1,39 @@
 #include "ObjectMgr/ObjectMgr.hpp"
 #include "Object/Object.hpp"
 #include "config.hpp"
+#include <cstdint>
 #include <cstdio>
 #include <climits>
 
 
 
-struct Slot {
-    Actor* ptr;
-    uint32_t generation;
-};
 
-struct PendingAdd {
-    Actor*   ptr;
-    ActorId* id;
-};
+
+
 
 std::vector<Slot>       actorSlots = {};
 std::vector<uint32_t>   freeList   = {};
 std::vector<PendingAdd> pendingAdds;
 
-ActorId* RegisterActor(Actor* actor) {
-    ActorId* newId  = new ActorId{UINT32_MAX, 0};
-    actor->actor_id = newId;
-    pendingAdds.push_back({actor, newId});
-    return newId;
+void RegisterActor(Actor* actor) {
+    
+    actor->actor_id = {UINT32_MAX, UINT32_MAX};
+    pendingAdds.push_back({actor, &actor->actor_id});
+
+#ifdef DEBUG_LOGS
+    printf("Registered actor at %p\n", (void*)actor);
+#endif
+    return;
 }
 
-Actor* GetActor(ActorId* id) {
-    if (id->index >= actorSlots.size()) {
+Actor* GetActor(ActorId id) {
+    if (id.index >= actorSlots.size()) {
         return nullptr;
     }
 
-    const Slot& slot = actorSlots[id->index];
+    const Slot& slot = actorSlots[id.index];
 
-    if (slot.generation != id->generation) {
+    if (slot.generation != id.generation) {
         return nullptr;
     }
 
@@ -55,10 +54,14 @@ void UpdateAll() {
     }
 }
 
-void StageDelete(ActorId* id) {
+void StageDelete(ActorId id) {
     Actor* actor = GetActor(id);
     if (!actor) return;
     actor->pendingDelete = true;
+
+#ifdef DEBUG_LOGS
+    printf("Staged deletion for actor at %p\n", (void*)actor);
+#endif
 }
 
 void RegisterStaged() {
@@ -79,6 +82,12 @@ void RegisterStaged() {
         *p.id = {index, gen};
 
         actorSlots[index] = {p.ptr, gen};
+        p.ptr->Init(*p.id);
+
+#ifdef DEBUG_LOGS
+        printf("Added actor at %p to slot %u (generation %u)\n", (void*)p.ptr, index, gen);
+#endif
+
     }
 
     pendingAdds.clear();
@@ -91,7 +100,6 @@ void RemoveStaged() {
         if (!slot.ptr) continue;
         if (!slot.ptr->pendingDelete) continue;
 
-        delete slot.ptr->actor_id;
         delete slot.ptr;
         slot.ptr = nullptr;
         
@@ -99,13 +107,16 @@ void RemoveStaged() {
         slot.generation++;
 
         freeList.push_back(i);
+
+#ifdef DEBUG_LOGS
+        printf("Deleted actor from slot %u, new generation %u\n", i, slot.generation);
+#endif
     }
 }
 
 void DeleteAllActors() {
     for (Slot& slot : actorSlots) {
         if (slot.ptr) {
-            delete slot.ptr->actor_id;
             delete slot.ptr;
             slot.ptr = nullptr;
         }
@@ -119,4 +130,8 @@ void DeleteAllActors() {
 void ProcessStagedActions() {
     RemoveStaged();
     RegisterStaged();
+}
+
+uint32_t GetActorCount() {
+    return actorSlots.size() - freeList.size();
 }

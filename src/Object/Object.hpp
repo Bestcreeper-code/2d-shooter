@@ -1,5 +1,6 @@
 #pragma once
 
+#include "box2d/box2d.h"
 class Actor;
 
 #include "Collision/Collisions.hpp"
@@ -21,11 +22,12 @@ enum ObjectType : uint8_t {
 
 class Actor {
     public:
-        ActorId* actor_id;
+        ActorId actor_id;
 
 
         bool pendingDelete = false;
 
+        virtual void Init(ActorId id) = 0;
         virtual void Update(float deltaTime) = 0;
         virtual void Draw() {}
         virtual ~Actor() = default;
@@ -43,7 +45,12 @@ class PhysicsObject : public Actor {
         virtual ~PhysicsObject() = default;
     
         
+        void Init(ActorId id) override {
 
+
+    
+            b2Body_SetUserData(body.bodyId, (void*)(uintptr_t)ActorIdToUint64(this->actor_id));
+        }
 
 
         virtual void onCollision(PhysicsObject* other) {}

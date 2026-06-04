@@ -30,7 +30,7 @@ Player::Player() : healthBar(30.0f, 10.0f) {
     filter.maskBits = COLLISION_LAYER_GROUND | COLLISION_LAYER_ENEMY | COLLISION_LAYER_ENEMY_BULLET
                     | COLLISION_LAYER_PLAYER_BONUS;
     
-    body = CreateBoxBody(this, gWorld, {3,3}, PX_2_M(sprite.GetFrame(0).width)/2,PX_2_M(sprite.GetFrame(0).height)/2, 1, 1,0, true, filter);
+    body = CreateBoxBody(gWorld, {3,3}, PX_2_M(sprite.GetFrame(0).width)/2,PX_2_M(sprite.GetFrame(0).height)/2, 1, 1,0, true, filter);
     
     b2MassData massData = b2Body_GetMassData(body.bodyId);
     massData.rotationalInertia = 1e38f; 

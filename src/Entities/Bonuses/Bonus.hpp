@@ -27,7 +27,7 @@ class Bonus : public PhysicsObject {
             filter.maskBits = COLLISION_LAYER_PLAYER;
     
             body = CreateBoxBody(
-                this, gWorld,
+                gWorld,
                 {PX_2_M(position.x), PX_2_M(position.y)},
                 halfW, halfH,
                 1.0f, 0.3f, 0.8f,

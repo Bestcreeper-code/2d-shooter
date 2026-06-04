@@ -5,6 +5,10 @@
 #define WINDOW_WIDTH 720
 #define WINDOW_HEIGHT 480
 
+
+#define DEBUG_LOGS
+
+
 #define GAME_KEY_DEBUG_TOGGLE   (KEY_G)
 
 #define GAME_KEY_LEFT   (KEY_A)

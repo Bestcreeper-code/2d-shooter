@@ -15,7 +15,7 @@ public:
     }
 
     float speed;
-    float shoot_cooldown = 0.2f;
+    float shoot_cooldown = 0.0002f;
 
     float max_health;
     float health;

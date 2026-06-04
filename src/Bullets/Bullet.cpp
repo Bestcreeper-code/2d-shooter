@@ -6,8 +6,11 @@
 #include "box2d/box2d.h"
 #include "box2d/math_functions.h"
 #include "config.hpp"
+#include "macros.hpp"
 #include "main.hpp"
+#include <chrono>
 #include <cstdio>
+#include <thread>
 
 
 
@@ -32,7 +35,7 @@ Bullet::Bullet(bool isPlayerBullet, b2Vec2 position, float dmg) : isPlayerBullet
     float halfH = std::max(PX_2_M(sprite.texture.height * sprite.scale) / 2.0f, 0.01f);
 
     body = CreateBoxBody(
-        this, gWorld,
+        gWorld,
         {PX_2_M(position.x), PX_2_M(position.y)},
         halfW, halfH,
         1.0f, 0.3f, 0.8f,
@@ -50,7 +53,6 @@ Bullet::~Bullet() {
     DestroyBody(body);
 }
 
-
 void Bullet::Update(float deltaTime) {
     
     b2Vec2 velocity = {0.0f, isPlayerBullet ? -speed : speed};
@@ -65,10 +67,10 @@ void Bullet::Draw() {
         M_2_PX(t.p.y) - ((float)sprite.texture.height / 2)
     });
 }
+
 void Bullet::onCollision(PhysicsObject* other){
     ObjectType otherType = other->getType();
     if (otherType == ObjectType::OBJ_TYPE_GROUND || otherType == (isPlayerBullet ? ObjectType::OBJ_TYPE_ENEMY : ObjectType::OBJ_TYPE_PLAYER)) {
-        
         StageDelete(actor_id);
     }
 }

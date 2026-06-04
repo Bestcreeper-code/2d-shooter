@@ -10,10 +10,20 @@ LIBS := $(BOX2D_LIB) $(RAYLIB_LIB) -lGL -lm -lpthread -ldl -lrt -lX11
 
 
 
-CXX_SRCS := $(shell find src -name "*.cpp")
-CXX_OBJS := $(CXX_SRCS:src/%.cpp=$(OBJ_DIR)/src/%.o)
+CXX_SRCS := $(shell find src -name "*.cpp") \
+	libs/imgui/imgui.cpp \
+	libs/imgui/imgui_draw.cpp \
+	libs/imgui/imgui_tables.cpp \
+	libs/imgui/imgui_widgets.cpp \
+	libs/rlImGui/rlImGui.cpp \
+	OS_Dep/Linux.cpp
+CXX_OBJS := $(patsubst %.cpp,$(OBJ_DIR)/%.o,$(CXX_SRCS))
 
-INCLUDES := -Ilibs/box2D/include -Ilibs/raylib/src -Isrc
+INCLUDES := -Ilibs/box2D/include \
+			-Ilibs/raylib/src \
+			-Ilibs/imgui \
+			-Ilibs/rlImGui \
+			-Isrc -IOS_Dep
 
  
 
@@ -52,12 +62,12 @@ $(RAYLIB_LIB):
 
 
 $(ELF): $(BOX2D_LIB) $(RAYLIB_LIB) $(CXX_OBJS)
-	$(CXX) $(CXX_OBJS) -o $@ $(LIBS) $(LDFLAGS)
+	$(CXX) $(LDFLAGS) $(CXX_OBJS) -o $@ $(LIBS) 
 
 
 
 
-$(OBJ_DIR)/src/%.o: src/%.cpp
+$(OBJ_DIR)/%.o: %.cpp
 	@mkdir -p $(dir $@)
 	@echo "Compiling $< -> $@"
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@

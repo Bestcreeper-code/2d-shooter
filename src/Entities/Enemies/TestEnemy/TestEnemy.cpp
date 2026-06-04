@@ -22,15 +22,14 @@ TestEnemy::TestEnemy(px_Vec2 pos) : healthBar(30, 5){
     
 
     sprite.SetTexture(TextureCache::GetTexture(IMG_DIR"Testenemy.png"));
-    
 
 
     b2Filter filter;
     filter.categoryBits = COLLISION_LAYER_ENEMY;
-    filter.maskBits = COLLISION_LAYER_GROUND | COLLISION_LAYER_GROUND| COLLISION_LAYER_PLAYER | COLLISION_LAYER_PLAYER_BULLET;
+    filter.maskBits = COLLISION_LAYER_GROUND | COLLISION_LAYER_PLAYER | COLLISION_LAYER_PLAYER_BULLET;
 
     
-    body = CreateBoxBody(this, gWorld, {PX_2_M(pos.x), PX_2_M(pos.y) }, PX_2_M(sprite.texture.width)/2,PX_2_M(sprite.texture.height)/2, 1, 1,0, true, filter);
+    body = CreateBoxBody(gWorld, {PX_2_M(pos.x), PX_2_M(pos.y) }, PX_2_M(sprite.texture.width)/2,PX_2_M(sprite.texture.height)/2, 1, 1,0, true, filter);
     
     b2MassData massData = b2Body_GetMassData(body.bodyId);
     massData.rotationalInertia = 1e38f; 

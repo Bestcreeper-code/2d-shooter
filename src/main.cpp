@@ -2,6 +2,7 @@
 #include "Entities/Bonuses/HealthPack.hpp"
 #include "Entities/Enemies/EnemySpawner.hpp"
 #include "Entities/Enemies/TestEnemy/TestEnemy.hpp"
+#include "osdep.hpp"
 #include "Object/Object.hpp"
 #include "ObjectMgr/ObjectMgr.hpp"
 #include "Platforms/Wall/Wall.hpp"
@@ -9,26 +10,32 @@
 #include "box2d/math_functions.h"
 #include "config.h"
 #include "config.hpp"
+#include "imgui_internal.h"
 #include "raylib.h"
 #include "Debug/Debug.hpp"
-
-
-
+#include "imgui.h"
 
 #include "raylib.h"
 #include "box2d/box2d.h"
-#include <algorithm>
-
-#include <vector>
+#include "rlImGui.h"
 
 
+
+bool debug_on = false;
+bool imgui_on = true;
+
+Player* player;
 
 int main(int argc, char** argv)
 {
 
-    InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "raylib + Box2D test");
+    InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Game");
     
     InitAudioDevice();
+
+    rlImGuiSetup(true);
+
+
 
     
     b2WorldDef worldDef = b2DefaultWorldDef();
@@ -45,7 +52,8 @@ int main(int argc, char** argv)
     
     RegisterActor(new TestEnemy((px_Vec2){300,30}));
 
-    RegisterActor(new Player());
+    player = new Player();
+    RegisterActor(player);
 
     RegisterActor(new HealthPack({200,200}, 25.0f));
     
@@ -56,7 +64,7 @@ int main(int argc, char** argv)
 
     SetTargetFPS(60);
 
-    bool debug_on;
+    
 
     while (!WindowShouldClose()) {
 
@@ -67,13 +75,51 @@ int main(int argc, char** argv)
         b2World_Step(gWorld, 1.0f / 60.0f, 4);
         ProcessCollisions();
         
+
+
         BeginDrawing();
         ClearBackground(BLACK);
+        rlImGuiBegin();
+
+        
+        if (ImGui::Begin("Debug", &imgui_on, ImGuiWindowFlags_AlwaysVerticalScrollbar)) {
+     
+            if (ImGui::CollapsingHeader("Actions", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                ImGui::MenuItem("Debug Draw", "G", &debug_on);
+                ImGui::SliderFloat("Player Health", &player->health, 0.0f, 100.0f);
+                ImGui::SliderFloat("Player Attack Speed", &player->shoot_cooldown, 0.0f, 2.0f);
+            }            
+
+            if (ImGui::CollapsingHeader("Object Manager"))
+            {
+                ImGui::Text("Total Actors Slots: %zu", actorSlots.size());
+                ImGui::Text("Used Actor List Space:");
+                
+                ImGui::ProgressBar((float)(GetActorCount() / (float)actorSlots.capacity()), ImVec2(0.0f, 0.0f));
+                ImGui::Text("(%u / %zu)", GetActorCount(), actorSlots.capacity());
+                
+            }   
+            if (ImGui::CollapsingHeader("System"))
+            {
+                ImGui::Text("FPS: %.1f", (float)GetFPS());
+                ImGui::Text("Frame Time: %.3f ms", (float)GetFrameTime() * 1000);
+                
+                ImGui::Text("Used Memory:");
+                ImGui::Text("Process: %.2f MB", GetProcessMemUsage() / (1024.0f * 1024.0f));
+            }
+        }
+        ImGui::End();
+        
+
         
         UpdateAll();
         
         if(debug_on)B2DebugDraw_Draw();
         
+
+
+        rlImGuiEnd();
         EndDrawing();
                 
         
@@ -83,6 +129,8 @@ int main(int argc, char** argv)
     DeleteAllActors();
     
     b2DestroyWorld(gWorld);
+    
+    rlImGuiShutdown();
 
     CloseWindow();
     return 0;

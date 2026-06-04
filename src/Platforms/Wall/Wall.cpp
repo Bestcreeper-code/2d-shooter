@@ -16,7 +16,6 @@ Wall::Wall(b2Vec2 position, float width, float height) {
     this->height = height;
 
     body = CreateBoxBody(
-        this,
         gWorld,
         {PX_2_M(position.x),PX_2_M(position.y)},
         PX_2_M(width),

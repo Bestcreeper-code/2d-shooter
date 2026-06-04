@@ -4,3 +4,9 @@
 [submodule "libs/box2D"]
 	path = libs/box2D
 	url = https://github.com/erincatto/box2d.git
+[submodule "libs/imgui"]
+	path = libs/imgui
+	url = https://github.com/ocornut/imgui.git
+[submodule "libs/rlImGui"]
+	path = libs/rlImGui
+	url = https://github.com/raylib-extras/rlImGui.git

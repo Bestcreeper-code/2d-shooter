@@ -34,7 +34,7 @@ typedef struct BodyResult
     b2ShapeId shapeId;
 } BodyResult;
 
-BodyResult CreateBoxBody(void* ownerptr, b2WorldId worldId, b2Vec2 position, 
+BodyResult CreateBoxBody( b2WorldId worldId, b2Vec2 position, 
     float hx, float hy, float density, float friction, float restitution, bool isDynamic, 
     b2Filter collFilter);
 

@@ -1,8 +1,12 @@
 #include "Collision/Collisions.hpp"
 #include "Collision/Collisions.hpp"
 #include "Object/Object.hpp"
+#include "ObjectMgr/ObjectMgr.hpp"
 #include "box2d/box2d.h"
 #include "box2d/types.h"
+#include "config.hpp"
+#include "macros.hpp"
+
 #include <cstdint>
 #include <cstdio>
 #include <unordered_set>
@@ -16,7 +20,6 @@ b2WorldId gWorld;
 
 
 BodyResult CreateBoxBody(
-    void* ownerptr,
     b2WorldId worldId,
     b2Vec2 position,
     float hx,
@@ -35,7 +38,7 @@ BodyResult CreateBoxBody(
     
     b2BodyId bodyId = b2CreateBody(worldId, &bodyDef);
 
-    b2Body_SetUserData(bodyId, ownerptr);
+    // b2Body_SetUserData(bodyId, ownerptr);
 
     b2Polygon box = b2MakeBox(hx, hy);
 
@@ -70,36 +73,58 @@ void ProcessCollisions() {
     for (int i = 0; i < events.beginCount; i++) {
         b2ContactBeginTouchEvent e = events.beginEvents[i];
 
-        if (!b2Shape_IsValid(e.shapeIdA) || !b2Shape_IsValid(e.shapeIdB)) continue;
+        if (!b2Shape_IsValid(e.shapeIdA) || !b2Shape_IsValid(e.shapeIdB)) {
+            errorf("Invalid shape in collision event");
+            continue;
+        } 
 
         b2BodyId bodyA = b2Shape_GetBody(e.shapeIdA);
         b2BodyId bodyB = b2Shape_GetBody(e.shapeIdB);
 
-        if (!b2Body_IsValid(bodyA) || !b2Body_IsValid(bodyB)) continue;
+        if (!b2Body_IsValid(bodyA) || !b2Body_IsValid(bodyB))
+        {
+            errorf("Invalid body in collision event");
+            continue;
+        } 
 
-        PhysicsObject* a = (PhysicsObject*)b2Body_GetUserData(bodyA);
-        PhysicsObject* b = (PhysicsObject*)b2Body_GetUserData(bodyB);
-        
+        ActorId actorIdA = Uint64ToActorId((uint64_t)b2Body_GetUserData(bodyA));
+        ActorId actorIdB = Uint64ToActorId((uint64_t)b2Body_GetUserData(bodyB));
 
-        if (!a || !b) continue;
+        if (actorIdA.index == UINT32_MAX || actorIdA.generation == UINT32_MAX  ||
+            actorIdB.index == UINT32_MAX || actorIdB.generation == UINT32_MAX) {
+
+            errorf("Collision with body with non init ActorId");
+            continue;
+        } 
+
+        Actor* actorA = GetActor(actorIdA);
+        Actor* actorB = GetActor(actorIdB);
+
+        PhysicsObject* a = dynamic_cast<PhysicsObject*>(actorA);
+        PhysicsObject* b = dynamic_cast<PhysicsObject*>(actorB);
+
+        if (!a || !b) {
+            errorf("Collision with stray body a: %p, b: %p",a,b);
+            continue;
+        }
         if (a->pendingDelete || b->pendingDelete) continue;
 
+
+#ifdef DEBUG_LOGS
+        printf("Collision detected between actor %p and actor %p\n", (void*)a, (void*)b);
+#endif
         a->onCollision(b);
         b->onCollision(a);
     }
 }
 
-static std::unordered_set<uintptr_t> destroyed;
 
 void DestroyBody(BodyResult body) {
     if (!b2Body_IsValid(body.bodyId)) return;
 
-    if (!destroyed.insert((uintptr_t)&body.bodyId.index1).second) {
-        printf("DOUBLE DESTROY DETECTED\n");
-        return;
+    if (!b2Body_IsEnabled(body.bodyId)) {
+        b2Body_Enable(body.bodyId);
     }
 
-    b2Body_SetUserData(body.bodyId, nullptr);
-    b2DestroyShape(body.shapeId, true);
     b2DestroyBody(body.bodyId);
 }

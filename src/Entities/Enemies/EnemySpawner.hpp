@@ -13,6 +13,7 @@ class EnemySpawner : public Actor {
     
         EnemySpawner(px_Vec2 spawn_area_top_left, px_Vec2 spawn_area_bott_right);
 
+        void Init(ActorId id) override {}
         void Update(float deltaTime) override;
     
 };
