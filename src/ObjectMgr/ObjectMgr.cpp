@@ -9,7 +9,7 @@
 
 
 
-
+bool gamePaused = false;
 
 std::vector<Slot>       actorSlots = {};
 std::vector<uint32_t>   freeList   = {};
@@ -49,11 +49,22 @@ void UpdateAll() {
         if (!slot.ptr) continue;
         if (slot.ptr->pendingDelete) continue;
 
-        slot.ptr->Update(dt);
-        slot.ptr->Draw();
+        if (!(slot.ptr->pausable && gamePaused))
+            slot.ptr->Update(dt);
+    }
+
+    for (uint8_t l = 0; l < MAX_DRAW_LAYERS; l++) {
+        for (size_t i = 0; i < actorSlots.size(); i++) {
+            Slot& slot = actorSlots[i];
+
+            if (!slot.ptr) continue;
+            if (slot.ptr->pendingDelete) continue;
+            if (slot.ptr->layer != l) continue;
+
+            slot.ptr->Draw();
+        }
     }
 }
-
 void StageDelete(ActorId id) {
     Actor* actor = GetActor(id);
     if (!actor) return;
@@ -82,7 +93,8 @@ void RegisterStaged() {
         *p.id = {index, gen};
 
         actorSlots[index] = {p.ptr, gen};
-        p.ptr->Init(*p.id);
+        p.ptr->actor_id = *p.id;
+        p.ptr->Init();
 
 #ifdef DEBUG_BUILD
         printf("Added actor at %p to slot %u (generation %u)\n", (void*)p.ptr, index, gen);

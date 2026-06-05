@@ -26,8 +26,10 @@ class Actor {
 
 
         bool pendingDelete = false;
+        bool pausable = true;
+        uint8_t layer = 0;
 
-        virtual void Init(ActorId id) = 0;
+        virtual void Init() = 0;
         virtual void Update(float deltaTime) = 0;
         virtual void Draw() {}
         virtual ~Actor() = default;
@@ -45,7 +47,7 @@ class PhysicsObject : public Actor {
         virtual ~PhysicsObject() = default;
     
         
-        void Init(ActorId id) override {
+        void Init() override {
 
 
     

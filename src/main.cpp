@@ -2,6 +2,9 @@
 #include "Entities/Bonuses/HealthPack.hpp"
 #include "Entities/Enemies/EnemySpawner.hpp"
 #include "Entities/Enemies/TestEnemy/TestEnemy.hpp"
+#include "UI/GameOver/GameOver.hpp"
+#include "UI/Hud/Hud.hpp"
+#include "UI/Shop/Shop.hpp"
 #include "osdep.hpp"
 #include "Object/Object.hpp"
 #include "ObjectMgr/ObjectMgr.hpp"
@@ -24,10 +27,14 @@
 
 bool debug_on = false;
 bool imgui_on = true;
+bool shop_on = true;
 
 uint32_t score;
 
 Player* player;
+EnemySpawner* enemySpawner;
+GameOverScreen* gameOverScreen;
+Shop* shop;
 
 int main(int argc, char** argv)
 {
@@ -59,7 +66,13 @@ int main(int argc, char** argv)
 
     RegisterActor(new HealthPack({200,200}, 25.0f));
     
-    RegisterActor(new EnemySpawner((px_Vec2){10,10},(px_Vec2){WINDOW_WIDTH - 10,70}));
+    enemySpawner = new EnemySpawner((px_Vec2){10,10},(px_Vec2){WINDOW_WIDTH - 10,70});
+    RegisterActor(enemySpawner);
+    gameOverScreen = new GameOverScreen();
+    RegisterActor(gameOverScreen);
+    RegisterActor(new Hud);
+    shop = new Shop;
+    RegisterActor(shop);
 
     ProcessStagedActions();
 
@@ -74,10 +87,16 @@ int main(int argc, char** argv)
             debug_on = !debug_on;
         } else if (IsKeyPressed(GAME_KEY_IMGUI_TOGGLE)) {
             imgui_on = !imgui_on;
+        } else if (IsKeyPressed(KEY_P)) {
+            gamePaused = !gamePaused;
+        } else if (IsKeyPressed(KEY_O)) {
+            shop_on = !shop_on;
         }
         
-        b2World_Step(gWorld, 1.0f / 60.0f, 4);
-        ProcessCollisions();
+        if (!gamePaused){
+            b2World_Step(gWorld, 1.0f / 60.0f, 4);
+            ProcessCollisions();
+        }
         
 
 
@@ -86,11 +105,12 @@ int main(int argc, char** argv)
         rlImGuiBegin();
 
         
-        if (ImGui::Begin("Debug", &imgui_on, ImGuiWindowFlags_AlwaysVerticalScrollbar)) {
+        if (imgui_on && ImGui::Begin("Debug", &imgui_on, ImGuiWindowFlags_AlwaysVerticalScrollbar)) {
             ImGui::Text("Score: %u",score);
             if (ImGui::CollapsingHeader("Actions", ImGuiTreeNodeFlags_DefaultOpen))
             {
                 ImGui::MenuItem("Debug Draw", "G", &debug_on);
+                ImGui::MenuItem("Pause", "", &gamePaused);
                 ImGui::SliderFloat("Player Health", &player->health, 0.0f, 100.0f);
                 ImGui::SliderFloat("Player Attack Speed", &player->shoot_cooldown, 0.0f, 2.0f);
             }            
@@ -126,8 +146,8 @@ int main(int argc, char** argv)
                 
             
             }
+            ImGui::End();
         }
-        ImGui::End();
         
 
         

@@ -25,6 +25,8 @@ static inline ActorId Uint64ToActorId(uint64_t value) {
 #include "Object/Object.hpp"
 #include <vector>
 
+#define MAX_DRAW_LAYERS 16
+
 struct Slot {
     Actor* ptr;
     uint32_t generation;
@@ -34,6 +36,8 @@ struct PendingAdd {
     Actor*   ptr;
     ActorId* id;
 };
+
+extern bool gamePaused;
 
 extern std::vector<Slot>       actorSlots;
 extern std::vector<uint32_t>   freeList;

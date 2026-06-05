@@ -4,6 +4,8 @@
 #include "Object/Object.hpp"
 #include "ObjectMgr/ObjectMgr.hpp"
 #include "Textures/TextureCache.hpp"
+#include "Sounds/SoundCache.hpp"
+#include "UI/GameOver/GameOver.hpp"
 #include "box2d/box2d.h"
 #include "box2d/collision.h"
 #include "box2d/math_functions.h"
@@ -104,6 +106,16 @@ void Player::Update(float deltaTime){
     
 }
 
+void Player::Die(){
+    gamePaused=true;
+    gameOverScreen->show = true;
+    enemySpawner->spawning = false;
+    
+    PlaySound(SoundCache::GetSound("res/snd/death_laugh.wav"));
+
+    StageDelete(actor_id);
+}
+
 void Player::onCollision(PhysicsObject* other) {
     if (other->pendingDelete)return;
     if (other->getType() == ObjectType::OBJ_TYPE_ENEMY_BULLET) {
@@ -112,8 +124,9 @@ void Player::onCollision(PhysicsObject* other) {
         health -= bullet->damage;
         if(health<=0){
             
-            StageDelete(actor_id);
+            Die();
         }
         was_hit_this_frame = true;
     }
 }
+

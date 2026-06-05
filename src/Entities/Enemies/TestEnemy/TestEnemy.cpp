@@ -19,7 +19,6 @@ TestEnemy::TestEnemy(px_Vec2 pos) : healthBar(30, 5){
     speed = 2.0f;
     health= max_health;
     
-    
 
     sprite.SetTexture(TextureCache::GetTexture(IMG_DIR"Testenemy.png"));
 

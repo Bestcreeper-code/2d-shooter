@@ -28,4 +28,6 @@ public:
     void Draw() override;
     void Update(float deltaTime) override;
     void onCollision(PhysicsObject *other) override;
+    
+    void Die();
 };

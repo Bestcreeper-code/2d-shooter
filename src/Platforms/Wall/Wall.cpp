@@ -10,7 +10,10 @@
 Wall::Wall(b2Vec2 position, float width, float height) {
     b2Filter filter;
     filter.categoryBits = COLLISION_LAYER_GROUND;
-    filter.maskBits = COLLISION_LAYER_PLAYER | COLLISION_LAYER_PLAYER_BULLET | COLLISION_LAYER_ENEMY_BULLET;
+    filter.maskBits = COLLISION_LAYER_PLAYER 
+    | COLLISION_LAYER_PLAYER_BULLET 
+    | COLLISION_LAYER_ENEMY_BULLET
+    | COLLISION_LAYER_ENEMY;
     
     this->width = width;
     this->height = height;

@@ -10,11 +10,13 @@ EnemySpawner::EnemySpawner(px_Vec2 spawn_area_top_left, px_Vec2 spawn_area_bott_
 : spawn_top_left(spawn_area_top_left), spawn_bott_right(spawn_area_bott_right) {
 
     spawnTimer = 0.0f;
+    spawning = true;
 }
+
 
 void EnemySpawner::Update(float deltaTime) {
     spawnTimer += deltaTime;
-    if (spawnTimer >= spawnInterval) {
+    if (spawnTimer >= spawnInterval && spawning) {
         spawnTimer = 0.0f;
         
         RegisterActor(new TestEnemy(
@@ -24,5 +26,6 @@ void EnemySpawner::Update(float deltaTime) {
                 }
             )
         );
+        
     }
 }
