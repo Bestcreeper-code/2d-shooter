@@ -6,10 +6,11 @@
 #define WINDOW_HEIGHT 480
 
 
-#define DEBUG_LOGS
+#define DEBUG_BUILD
 
 
 #define GAME_KEY_DEBUG_TOGGLE   (KEY_G)
+#define GAME_KEY_IMGUI_TOGGLE   (KEY_I)
 
 #define GAME_KEY_LEFT   (KEY_A)
 #define GAME_KEY_RIGHT  (KEY_D)

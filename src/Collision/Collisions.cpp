@@ -100,8 +100,8 @@ void ProcessCollisions() {
         Actor* actorA = GetActor(actorIdA);
         Actor* actorB = GetActor(actorIdB);
 
-        PhysicsObject* a = dynamic_cast<PhysicsObject*>(actorA);
-        PhysicsObject* b = dynamic_cast<PhysicsObject*>(actorB);
+        PhysicsObject* a = static_cast<PhysicsObject*>(actorA);
+        PhysicsObject* b = static_cast<PhysicsObject*>(actorB);
 
         if (!a || !b) {
             errorf("Collision with stray body a: %p, b: %p",a,b);
@@ -110,7 +110,7 @@ void ProcessCollisions() {
         if (a->pendingDelete || b->pendingDelete) continue;
 
 
-#ifdef DEBUG_LOGS
+#ifdef DEBUG_BUILD
         printf("Collision detected between actor %p and actor %p\n", (void*)a, (void*)b);
 #endif
         a->onCollision(b);

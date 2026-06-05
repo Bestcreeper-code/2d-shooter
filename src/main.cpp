@@ -18,11 +18,14 @@
 #include "raylib.h"
 #include "box2d/box2d.h"
 #include "rlImGui.h"
+#include <cstdint>
 
 
 
 bool debug_on = false;
 bool imgui_on = true;
+
+uint32_t score;
 
 Player* player;
 
@@ -47,10 +50,9 @@ int main(int argc, char** argv)
     RegisterActor(new Wall({0,-32}, WINDOW_WIDTH, 33));
     RegisterActor(new Wall({-32,0}, 33,WINDOW_HEIGHT));
     RegisterActor(new Wall({WINDOW_WIDTH+32,0}, 33,WINDOW_HEIGHT));
-    RegisterActor(new Wall({0,WINDOW_HEIGHT}, WINDOW_WIDTH, 33));
+    RegisterActor(new Wall({0,WINDOW_HEIGHT+32}, WINDOW_WIDTH, 33));
     
     
-    RegisterActor(new TestEnemy((px_Vec2){300,30}));
 
     player = new Player();
     RegisterActor(player);
@@ -70,6 +72,8 @@ int main(int argc, char** argv)
 
         if (IsKeyPressed(GAME_KEY_DEBUG_TOGGLE)) {
             debug_on = !debug_on;
+        } else if (IsKeyPressed(GAME_KEY_IMGUI_TOGGLE)) {
+            imgui_on = !imgui_on;
         }
         
         b2World_Step(gWorld, 1.0f / 60.0f, 4);
@@ -83,7 +87,7 @@ int main(int argc, char** argv)
 
         
         if (ImGui::Begin("Debug", &imgui_on, ImGuiWindowFlags_AlwaysVerticalScrollbar)) {
-     
+            ImGui::Text("Score: %u",score);
             if (ImGui::CollapsingHeader("Actions", ImGuiTreeNodeFlags_DefaultOpen))
             {
                 ImGui::MenuItem("Debug Draw", "G", &debug_on);
@@ -100,13 +104,27 @@ int main(int argc, char** argv)
                 ImGui::Text("(%u / %zu)", GetActorCount(), actorSlots.capacity());
                 
             }   
-            if (ImGui::CollapsingHeader("System"))
+            if (ImGui::CollapsingHeader("Performances"))
             {
-                ImGui::Text("FPS: %.1f", (float)GetFPS());
-                ImGui::Text("Frame Time: %.3f ms", (float)GetFrameTime() * 1000);
+                ImGui::Indent(20.0f);
+                if (ImGui::CollapsingHeader("System"))
+                {
+                    ImGui::Text("FPS: %.1f", (float)GetFPS());
+                    ImGui::Text("Frame Time: %.3f ms", (float)GetFrameTime() * 1000);
+                    
+                    ImGui::Text("Used Memory:");
+                    ImGui::Text("Game Allocs: %.2f MB", GetAllocMemUsage() / (1024.0f * 1024.0f));
+                    ImGui::Text("Process: %.2f MB", GetTotalProcessMemUsage() / (1024.0f * 1024.0f));
+                }
+                if (ImGui::CollapsingHeader("Box2D"))
+                {
+                    b2Counters b2Counts = b2World_GetCounters(gWorld);
+                    ImGui::Text("Bodies: %u", b2Counts.bodyCount);
+                }
+                ImGui::Unindent();
+
                 
-                ImGui::Text("Used Memory:");
-                ImGui::Text("Process: %.2f MB", GetProcessMemUsage() / (1024.0f * 1024.0f));
+            
             }
         }
         ImGui::End();

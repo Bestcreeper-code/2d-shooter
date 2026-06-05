@@ -4,7 +4,8 @@ ELF := Game
 OBJ_DIR := build
 
 BOX2D_LIB := libs/box2D/build/src/libbox2d.a
-RAYLIB_LIB := libs/raylib/src/libraylib.a
+
+RAYLIB_LIB := build/raylib/libraylib.a
 
 LIBS := $(BOX2D_LIB) $(RAYLIB_LIB) -lGL -lm -lpthread -ldl -lrt -lX11
 
@@ -27,11 +28,20 @@ INCLUDES := -Ilibs/box2D/include \
 
  
 
-CXXFLAGS_DEBUG := -O0 -g -Wall -Werror -fsanitize=address -g -fno-omit-frame-pointer
-CXXFLAGS_RELEASE := -Os -s -fdata-sections -ffunction-sections -Wall -Werror -g
+CXXFLAGS_DEBUG := -O0 -g -Wall -Werror -g -fno-omit-frame-pointer
+CXXFLAGS_RELEASE := -O2 -DNDEBUG \
+	-flto \
+	-fdata-sections -ffunction-sections \
+	-fomit-frame-pointer \
+	-fno-exceptions -fno-rtti \
+	-march=native
 
-LDFLAGS_DEBUG := -fsanitize=address
-LDFLAGS_RELEASE := 
+
+
+LDFLAGS_DEBUG := 
+LDFLAGS_RELEASE := -flto \
+	-Wl,--gc-sections \
+	-Wl,--strip-all
 
 
 
@@ -44,8 +54,13 @@ debug: CXXFLAGS := $(CXXFLAGS_DEBUG)
 debug: LDFLAGS := $(LDFLAGS_DEBUG)
 debug: $(ELF)
 
-release: CXXFLAGS := $(CXXFLAGS_RELEASE)
-release: LDFLAGS := $(LDFLAGS_RELEASE)
+asan: CXXFLAGS := $(CXXFLAGS_DEBUG) -fsanitize=address -g
+asan: LDFLAGS := $(LDFLAGS_DEBUG) -fsanitize=address
+asan: $(ELF)
+
+
+release: CXXFLAGS := $(CXXFLAGS_RELEASE) 
+release: LDFLAGS := $(LDFLAGS_RELEASE) 
 release: $(ELF)
 
 
@@ -56,8 +71,10 @@ $(BOX2D_LIB):
 	@(cd libs/box2D && ./build.sh)
 
 $(RAYLIB_LIB):
+
 	@echo "Building Raylib"
-	@(cd libs/raylib/src && make -j4)
+	@(cd build && cmake ../libs/raylib/)
+	@(cd build && make -j4)
 
 
 
@@ -75,4 +92,10 @@ $(OBJ_DIR)/%.o: %.cpp
 
 
 clean:
-	rm -rf $(OBJ_DIR) $(ELF)
+	rm -rf $(OBJ_DIR)/src/ $(ELF)
+
+
+clean-all: clean
+	rm -rf libs/box2D/build/*
+	rm -rf $(OBJ_DIR)/* $(ELF)
+	$(MAKE) -C build/raylib clean

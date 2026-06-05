@@ -5,3 +5,4 @@
 #include <vector>
 
 
+extern uint32_t score;

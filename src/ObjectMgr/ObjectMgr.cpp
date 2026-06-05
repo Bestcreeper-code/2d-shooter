@@ -20,7 +20,7 @@ void RegisterActor(Actor* actor) {
     actor->actor_id = {UINT32_MAX, UINT32_MAX};
     pendingAdds.push_back({actor, &actor->actor_id});
 
-#ifdef DEBUG_LOGS
+#ifdef DEBUG_BUILD
     printf("Registered actor at %p\n", (void*)actor);
 #endif
     return;
@@ -59,7 +59,7 @@ void StageDelete(ActorId id) {
     if (!actor) return;
     actor->pendingDelete = true;
 
-#ifdef DEBUG_LOGS
+#ifdef DEBUG_BUILD
     printf("Staged deletion for actor at %p\n", (void*)actor);
 #endif
 }
@@ -84,7 +84,7 @@ void RegisterStaged() {
         actorSlots[index] = {p.ptr, gen};
         p.ptr->Init(*p.id);
 
-#ifdef DEBUG_LOGS
+#ifdef DEBUG_BUILD
         printf("Added actor at %p to slot %u (generation %u)\n", (void*)p.ptr, index, gen);
 #endif
 
@@ -108,7 +108,7 @@ void RemoveStaged() {
 
         freeList.push_back(i);
 
-#ifdef DEBUG_LOGS
+#ifdef DEBUG_BUILD
         printf("Deleted actor from slot %u, new generation %u\n", i, slot.generation);
 #endif
     }

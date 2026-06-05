@@ -2,5 +2,7 @@ build/
 .vscode/
 .cache/
 
-./Game
-./Game.exe
+Game
+Game.elf
+Game.exe
+imgui.ini

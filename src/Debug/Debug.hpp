@@ -11,3 +11,4 @@ b2DebugDraw* B2DebugDraw_GetDraw();
 
 Vector2 B2Debug_ToScreen(b2Vec2 v);
 Color B2Debug_HexToColor(b2HexColor hex, unsigned char alpha);
+

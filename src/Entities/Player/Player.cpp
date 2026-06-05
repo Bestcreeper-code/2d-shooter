@@ -21,9 +21,9 @@ Player::Player() : healthBar(30.0f, 10.0f) {
     health = 100.0f;
     
     sprite.frameDuration = 0.1f;
-    sprite.AddFrame(LoadTexture(IMG_DIR"Player1.png"));
-    sprite.AddFrame(LoadTexture(IMG_DIR"Player2.png"));
-    sprite.AddFrame(LoadTexture(IMG_DIR"Player3.png"));
+    sprite.AddFrame(TextureCache::GetTexture(IMG_DIR"Player1.png"));
+    sprite.AddFrame(TextureCache::GetTexture(IMG_DIR"Player2.png"));
+    sprite.AddFrame(TextureCache::GetTexture(IMG_DIR"Player3.png"));
     
     b2Filter filter;
     filter.categoryBits = COLLISION_LAYER_PLAYER;
@@ -107,7 +107,7 @@ void Player::Update(float deltaTime){
 void Player::onCollision(PhysicsObject* other) {
     if (other->pendingDelete)return;
     if (other->getType() == ObjectType::OBJ_TYPE_ENEMY_BULLET) {
-        Bullet* bullet = dynamic_cast<Bullet*>(other);
+        Bullet* bullet = static_cast<Bullet*>(other);
         if (!bullet) return;
         health -= bullet->damage;
         if(health<=0){

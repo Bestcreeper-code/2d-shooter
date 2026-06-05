@@ -39,6 +39,7 @@ TestEnemy::TestEnemy(px_Vec2 pos) : healthBar(30, 5){
 
 TestEnemy::~TestEnemy(){
     DestroyBody(body);
+    score++;
 }
 
 void TestEnemy::Draw() {

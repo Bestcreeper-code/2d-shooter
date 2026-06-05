@@ -1,8 +1,12 @@
 #include "Collision/Collisions.hpp"
 #include "box2d/types.h"
 #include "config.h"
+#include "imgui.h"
+#include "osdep.hpp"
 #include "raylib.h"
 #include "box2d/math_functions.h"
+#include <algorithm>
+#include <iterator>
 #include <math.h>
 
 
@@ -186,3 +190,5 @@ b2DebugDraw* B2DebugDraw_GetDraw()
 {
     return &s_debugDraw;
 }
+
+
