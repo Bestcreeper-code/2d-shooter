@@ -14,7 +14,7 @@ class Bonus : public PhysicsObject {
         Sprite sprite;
     
     public:
-        Bonus(px_Vec2 position, const std::string& path)
+        Bonus(Vector2 position, const std::string& path)
             : spritePath(path)
         {
             sprite.SetTexture(TextureCache::GetTexture(spritePath));

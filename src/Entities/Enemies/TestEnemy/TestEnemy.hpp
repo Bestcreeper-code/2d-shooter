@@ -23,7 +23,7 @@ public:
     float health;
 
     Sprite sprite;
-    TestEnemy(px_Vec2 pos);
+    TestEnemy(Vector2 pos);
     ~TestEnemy();
 
     

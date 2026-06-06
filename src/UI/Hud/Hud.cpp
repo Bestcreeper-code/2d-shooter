@@ -1,5 +1,6 @@
 #include "Hud.hpp"
 #include "Entities/Player/Player.hpp"
+#include "UI/Button/Button.hpp"
 #include "config.hpp"
 #include "raylib.h"
 #include "main.hpp"
@@ -7,8 +8,9 @@
 
 Hud::Hud() {
     pausable = false;
-    layer = MAX_DRAW_LAYERS-2;
+    drawing_layer = DL_HUD;
 }
+
 
 void Hud::Update(float dTime) {
 

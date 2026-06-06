@@ -110,7 +110,7 @@ void ProcessCollisions() {
         if (a->pendingDelete || b->pendingDelete) continue;
 
 
-#ifdef DEBUG_BUILD
+#ifdef DEBUG_COLLISIONS
         printf("Collision detected between actor %p and actor %p\n", (void*)a, (void*)b);
 #endif
         a->onCollision(b);

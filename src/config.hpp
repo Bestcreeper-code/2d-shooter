@@ -7,6 +7,8 @@
 
 
 #define DEBUG_BUILD
+#define DEBUG_OBJMGR
+#define DEBUG_COLLISIONS
 
 
 #define GAME_KEY_DEBUG_TOGGLE   (KEY_G)

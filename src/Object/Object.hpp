@@ -20,6 +20,8 @@ enum ObjectType : uint8_t {
     OBJ_TYPE_GROUND,
 };
 
+
+
 class Actor {
     public:
         ActorId actor_id;
@@ -27,7 +29,7 @@ class Actor {
 
         bool pendingDelete = false;
         bool pausable = true;
-        uint8_t layer = 0;
+        uint8_t drawing_layer = 0;
 
         virtual void Init() = 0;
         virtual void Update(float deltaTime) = 0;

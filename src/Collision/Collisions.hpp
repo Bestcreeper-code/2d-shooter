@@ -25,7 +25,7 @@ enum CollisionLayer {
 extern b2WorldDef worldDef;
 extern b2WorldId gWorld;
 
-typedef b2Vec2 px_Vec2;
+
 typedef b2Vec2 m_Vec2;
 
 typedef struct BodyResult

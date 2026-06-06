@@ -14,7 +14,7 @@ public:
     
 
 
-    HealthPack(px_Vec2 position, float healing_amount) : Bonus(position, IMG_DIR"health_pack.png")  {
+    HealthPack(Vector2 position, float healing_amount) : Bonus(position, IMG_DIR"health_pack.png")  {
         this->heal_amount = healing_amount;
     }
     ~HealthPack();

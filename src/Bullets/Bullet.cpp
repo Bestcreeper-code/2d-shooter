@@ -8,6 +8,7 @@
 #include "config.hpp"
 #include "macros.hpp"
 #include "main.hpp"
+#include "raymath.h"
 #include <chrono>
 #include <cstdio>
 #include <thread>
@@ -18,7 +19,7 @@
 
 
 // #error "fix the segfault"
-Bullet::Bullet(bool isPlayerBullet, b2Vec2 position, float dmg) : isPlayerBullet(isPlayerBullet), damage(dmg) {
+Bullet::Bullet(bool isPlayerBullet, Vector2 position, float dmg) : isPlayerBullet(isPlayerBullet), damage(dmg) {
     
     
     speed = 5.0f;

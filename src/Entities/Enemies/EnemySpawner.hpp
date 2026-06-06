@@ -7,12 +7,12 @@
 class EnemySpawner : public Actor {
         float spawnTimer;
         float spawnInterval = 5.0f; 
-        px_Vec2 spawn_top_left;
-        px_Vec2 spawn_bott_right;
+        Vector2 spawn_top_left;
+        Vector2 spawn_bott_right;
     public:
         bool spawning;
 
-        EnemySpawner(px_Vec2 spawn_area_top_left, px_Vec2 spawn_area_bott_right);
+        EnemySpawner(Vector2 spawn_area_top_left, Vector2 spawn_area_bott_right);
 
         void Init() override {}
         void Update(float deltaTime) override;

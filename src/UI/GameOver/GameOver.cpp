@@ -1,6 +1,7 @@
 #include "GameOver.hpp"
 #include "ObjectMgr/ObjectMgr.hpp"
 #include "config.hpp"
+#include "main.hpp"
 #include "raylib.h"
 #include <cstdint>
 #include <cstdlib>
@@ -8,7 +9,8 @@
 
 GameOverScreen::GameOverScreen() {
     pausable = false;
-    layer = MAX_DRAW_LAYERS-3;
+    show = false;
+    drawing_layer = DL_PAUSE_MENU_BG;
 }
 
 void GameOverScreen::Update(float deltaTime) {

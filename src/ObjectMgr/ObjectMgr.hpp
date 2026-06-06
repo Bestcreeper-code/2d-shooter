@@ -25,7 +25,7 @@ static inline ActorId Uint64ToActorId(uint64_t value) {
 #include "Object/Object.hpp"
 #include <vector>
 
-#define MAX_DRAW_LAYERS 16
+
 
 struct Slot {
     Actor* ptr;

@@ -1,6 +1,7 @@
 #include "ObjectMgr/ObjectMgr.hpp"
 #include "Object/Object.hpp"
 #include "config.hpp"
+#include "main.hpp"
 #include <cstdint>
 #include <cstdio>
 #include <climits>
@@ -20,7 +21,7 @@ void RegisterActor(Actor* actor) {
     actor->actor_id = {UINT32_MAX, UINT32_MAX};
     pendingAdds.push_back({actor, &actor->actor_id});
 
-#ifdef DEBUG_BUILD
+#ifdef DEBUG_OBJMGR
     printf("Registered actor at %p\n", (void*)actor);
 #endif
     return;
@@ -59,7 +60,7 @@ void UpdateAll() {
 
             if (!slot.ptr) continue;
             if (slot.ptr->pendingDelete) continue;
-            if (slot.ptr->layer != l) continue;
+            if (slot.ptr->drawing_layer != l) continue;
 
             slot.ptr->Draw();
         }
@@ -70,7 +71,7 @@ void StageDelete(ActorId id) {
     if (!actor) return;
     actor->pendingDelete = true;
 
-#ifdef DEBUG_BUILD
+#ifdef DEBUG_OBJMGR
     printf("Staged deletion for actor at %p\n", (void*)actor);
 #endif
 }
@@ -96,7 +97,7 @@ void RegisterStaged() {
         p.ptr->actor_id = *p.id;
         p.ptr->Init();
 
-#ifdef DEBUG_BUILD
+#ifdef DEBUG_OBJMGR
         printf("Added actor at %p to slot %u (generation %u)\n", (void*)p.ptr, index, gen);
 #endif
 
@@ -120,7 +121,7 @@ void RemoveStaged() {
 
         freeList.push_back(i);
 
-#ifdef DEBUG_BUILD
+#ifdef DEBUG_OBJMGR
         printf("Deleted actor from slot %u, new generation %u\n", i, slot.generation);
 #endif
     }

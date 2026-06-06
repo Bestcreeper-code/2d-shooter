@@ -6,17 +6,21 @@
 #include "Textures/TextureCache.hpp"
 #include "Sounds/SoundCache.hpp"
 #include "UI/GameOver/GameOver.hpp"
+#include "UI/Shop/Shop.hpp"
 #include "box2d/box2d.h"
 #include "box2d/collision.h"
 #include "box2d/math_functions.h"
 #include "box2d/types.h"
 #include "config.hpp"
+#include "macros.hpp"
 #include "raylib.h"
 
 #include "main.hpp"
 
 
+
 Player::Player() : healthBar(30.0f, 10.0f) {
+    
     speed = 2.0f;
 
     max_health = 100.0f;
@@ -37,6 +41,41 @@ Player::Player() : healthBar(30.0f, 10.0f) {
     b2MassData massData = b2Body_GetMassData(body.bodyId);
     massData.rotationalInertia = 1e38f; 
     b2Body_SetMassData(body.bodyId, massData); 
+}
+
+
+void max_health_buy(ShopItem* item) {
+    Player* player = static_cast<Player*>(item->userData);
+    item->price = (uint32_t)(player->max_health / 50) * 8; // recalc next time
+    if (score < item->price) return;
+    score -= item->price;
+    player->max_health += 50;
+    player->health += 50;
+    if (player->health > player->max_health)
+        player->health = player->max_health;
+}
+
+
+
+void attack_speed_buy(ShopItem* item) {
+    Player* player = static_cast<Player*>(item->userData);
+
+    item->price = (uint32_t)(0.3f / player->shoot_cooldown * 10);
+    if (score < item->price) return;
+    score -= item->price;
+    player->shoot_cooldown *= 0.80f;
+    if (player->shoot_cooldown < 0.05f)
+        player->shoot_cooldown = 0.05f;
+}
+
+void Player::Init() {
+    
+shop->AddItem("Max Health", "+50 max HP", 8, max_health_buy, player);
+    
+    shop->AddItem("Attack Speed", "Fire 20%% faster",
+        (uint32_t)(0.3f / player->shoot_cooldown * 10),
+        attack_speed_buy, player);
+
 }
 
 Player::~Player() {
@@ -79,7 +118,7 @@ void Player::Update(float deltaTime){
     if (IsKeyDown(GAME_KEY_FIRE) && time_until_can_shoot <= 0.0f) {
         b2Transform t = b2Body_GetTransform(body.bodyId);
 
-        b2Vec2 bulletPos = {M_2_PX(t.p.x), M_2_PX(t.p.y)-10};
+        Vector2 bulletPos = {M_2_PX(t.p.x), M_2_PX(t.p.y)-10};
         Bullet* bullet = new Bullet(true, bulletPos, 10.0f);
         RegisterActor(bullet);
 

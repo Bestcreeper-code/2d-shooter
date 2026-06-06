@@ -15,7 +15,7 @@
 #include "main.hpp"
 
 
-TestEnemy::TestEnemy(px_Vec2 pos) : healthBar(30, 5){
+TestEnemy::TestEnemy(Vector2 pos) : healthBar(30, 5){
     speed = 2.0f;
     health= max_health;
     
@@ -67,7 +67,7 @@ void TestEnemy::Update(float deltaTime){
     if (time_until_can_shoot <= 0.0f) {
         b2Transform t = b2Body_GetTransform(body.bodyId);
 
-        b2Vec2 bulletPos = {M_2_PX(t.p.x), M_2_PX(t.p.y) + 10};
+        Vector2 bulletPos = {M_2_PX(t.p.x), M_2_PX(t.p.y) + 10};
         Bullet* bullet = new Bullet(false, bulletPos, 1.0f);
         RegisterActor(bullet);
 

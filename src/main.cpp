@@ -1,3 +1,4 @@
+#include "main.hpp"
 #include "Collision/Collisions.hpp"
 #include "Entities/Bonuses/HealthPack.hpp"
 #include "Entities/Enemies/EnemySpawner.hpp"
@@ -27,7 +28,7 @@
 
 bool debug_on = false;
 bool imgui_on = true;
-bool shop_on = true;
+
 
 uint32_t score;
 
@@ -40,7 +41,6 @@ int main(int argc, char** argv)
 {
 
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Game");
-    
     InitAudioDevice();
 
     rlImGuiSetup(true);
@@ -53,26 +53,31 @@ int main(int argc, char** argv)
     gWorld = b2CreateWorld(&worldDef);
 
     B2DebugDraw_Init();
-    
+//world   
     RegisterActor(new Wall({0,-32}, WINDOW_WIDTH, 33));
     RegisterActor(new Wall({-32,0}, 33,WINDOW_HEIGHT));
     RegisterActor(new Wall({WINDOW_WIDTH+32,0}, 33,WINDOW_HEIGHT));
     RegisterActor(new Wall({0,WINDOW_HEIGHT+32}, WINDOW_WIDTH, 33));
     
-    
-
-    player = new Player();
-    RegisterActor(player);
-
-    RegisterActor(new HealthPack({200,200}, 25.0f));
-    
-    enemySpawner = new EnemySpawner((px_Vec2){10,10},(px_Vec2){WINDOW_WIDTH - 10,70});
-    RegisterActor(enemySpawner);
+//UI
     gameOverScreen = new GameOverScreen();
     RegisterActor(gameOverScreen);
+
     RegisterActor(new Hud);
     shop = new Shop;
+
     RegisterActor(shop);
+
+
+//entities
+    player = new Player();
+    RegisterActor(player);
+       
+    enemySpawner = new EnemySpawner((Vector2){10,10},(Vector2){WINDOW_WIDTH - 10,70});
+    RegisterActor(enemySpawner);
+
+    RegisterActor(new HealthPack({200,200}, 25.0f));
+
 
     ProcessStagedActions();
 
@@ -90,7 +95,7 @@ int main(int argc, char** argv)
         } else if (IsKeyPressed(KEY_P)) {
             gamePaused = !gamePaused;
         } else if (IsKeyPressed(KEY_O)) {
-            shop_on = !shop_on;
+            shop->show = !shop->show;
         }
         
         if (!gamePaused){
@@ -106,7 +111,7 @@ int main(int argc, char** argv)
 
         
         if (imgui_on && ImGui::Begin("Debug", &imgui_on, ImGuiWindowFlags_AlwaysVerticalScrollbar)) {
-            ImGui::Text("Score: %u",score);
+            ImGui::SliderInt("Score",(int*)&score,0,100);
             if (ImGui::CollapsingHeader("Actions", ImGuiTreeNodeFlags_DefaultOpen))
             {
                 ImGui::MenuItem("Debug Draw", "G", &debug_on);
