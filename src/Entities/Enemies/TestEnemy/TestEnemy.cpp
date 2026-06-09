@@ -13,6 +13,7 @@
 #include "raylib.h"
 
 #include "main.hpp"
+#include <cstdio>
 
 
 TestEnemy::TestEnemy(Vector2 pos) : healthBar(30, 5){
@@ -36,6 +37,10 @@ TestEnemy::TestEnemy(Vector2 pos) : healthBar(30, 5){
     b2Body_SetBullet(body.bodyId, true);
 }
 
+void TestEnemy::Init(){
+    b2Body_SetUserData(body.bodyId, (void*)(uintptr_t)ActorIdToUint64(this->actor_id));
+}
+
 TestEnemy::~TestEnemy(){
     DestroyBody(body);
     score++;
@@ -50,7 +55,7 @@ void TestEnemy::Draw() {
         M_2_PX(t.p.y) - ((float)tex.height / 2)
     });
 
-    healthBar.Draw((b2Vec2){M_2_PX(t.p.x), M_2_PX(t.p.y) - 30}, health);
+    healthBar.Draw((b2Vec2){M_2_PX(t.p.x), M_2_PX(t.p.y) - 30}, health/max_health*100);
 
     
 
@@ -87,6 +92,7 @@ void TestEnemy::Update(float deltaTime){
 }
 
 void TestEnemy::onCollision(PhysicsObject *other){
+    if(other->getType()!= OBJ_TYPE_ENEMY_BULLET)printf("%s",ObjectTypeName(other->getType()));
     if (other->getType() == ObjectType::OBJ_TYPE_PLAYER_BULLET) {
         health -= ((Bullet*)other)->damage;
         if(health <= 0) {

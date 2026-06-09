@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include <memory>
 #include <ostream>
+#include <string>
 #include <thread>
 
 #define SHOP_WIDTH 300
@@ -34,6 +35,16 @@ void Shop::Update(float deltaTime) {
             items.erase(items.begin() + i);
             buttons.erase(buttons.begin() + i);
         } else {
+            buttons[i]->SetText(
+                items[i]->name + '(' + std::to_string(items[i]->price) +")"
+            );
+            
+            buttons[i]->text_color = items[i]->price>score?
+                    RED : GREEN;
+            buttons[i]->text_pressed_color = items[i]->price>score?
+                    MAROON : DARKGREEN;
+
+            
             ++i;
         }
     }
@@ -79,7 +90,7 @@ void Shop::AddItem(const std::string& name,
         15,
         ShopButtonClick,
         nullptr,
-        BLUE, DARKBLUE, RED, GREEN
+        BLUE, DARKBLUE, GREEN, DARKGREEN
     ));
 
     buttons.back()->userData = rawItem;

@@ -16,6 +16,11 @@
 #include "raylib.h"
 
 #include "main.hpp"
+#include <chrono>
+#include <cstdint>
+#include <cstdio>
+#include <format>
+#include <string>
 
 
 
@@ -41,6 +46,7 @@ Player::Player() : healthBar(30.0f, 10.0f) {
     b2MassData massData = b2Body_GetMassData(body.bodyId);
     massData.rotationalInertia = 1e38f; 
     b2Body_SetMassData(body.bodyId, massData); 
+    
 }
 
 
@@ -53,6 +59,9 @@ void max_health_buy(ShopItem* item) {
     player->health += 50;
     if (player->health > player->max_health)
         player->health = player->max_health;
+
+    
+    
 }
 
 
@@ -70,12 +79,14 @@ void attack_speed_buy(ShopItem* item) {
 
 void Player::Init() {
     
-shop->AddItem("Max Health", "+50 max HP", 8, max_health_buy, player);
-    
+    shop->AddItem("Max Health", "+50 max HP", 8, max_health_buy, player);
+        
     shop->AddItem("Attack Speed", "Fire 20%% faster",
         (uint32_t)(0.3f / player->shoot_cooldown * 10),
         attack_speed_buy, player);
-
+    
+        b2Body_SetUserData(body.bodyId, (void*)(uintptr_t)ActorIdToUint64(this->actor_id));
+    
 }
 
 Player::~Player() {
@@ -121,7 +132,6 @@ void Player::Update(float deltaTime){
         Vector2 bulletPos = {M_2_PX(t.p.x), M_2_PX(t.p.y)-10};
         Bullet* bullet = new Bullet(true, bulletPos, 10.0f);
         RegisterActor(bullet);
-
         time_until_can_shoot = shoot_cooldown;
     }
     // normalized
@@ -156,7 +166,7 @@ void Player::Die(){
 }
 
 void Player::onCollision(PhysicsObject* other) {
-    if (other->pendingDelete)return;
+    printf("const char *__restrict format, ...");
     if (other->getType() == ObjectType::OBJ_TYPE_ENEMY_BULLET) {
         Bullet* bullet = static_cast<Bullet*>(other);
         if (!bullet) return;

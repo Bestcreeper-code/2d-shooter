@@ -54,9 +54,9 @@ debug: CXXFLAGS := $(CXXFLAGS_DEBUG)
 debug: LDFLAGS := $(LDFLAGS_DEBUG)
 debug: $(ELF)
 
-asan: CXXFLAGS := $(CXXFLAGS_DEBUG) -fsanitize=address -g
-asan: LDFLAGS := $(LDFLAGS_DEBUG) -fsanitize=address
-asan: $(ELF)
+sanitize: CXXFLAGS := $(CXXFLAGS_DEBUG) -fsanitize=address -fsanitize=undefined -fPIC -g
+sanitize: LDFLAGS := $(LDFLAGS_DEBUG) -fsanitize=address -fsanitize=undefined
+sanitize: $(ELF)
 
 
 release: CXXFLAGS := $(CXXFLAGS_RELEASE) 

@@ -70,6 +70,7 @@ BodyResult CreateBoxBody(
 
 void ProcessCollisions() {
     b2ContactEvents events = b2World_GetContactEvents(gWorld);
+
     for (int i = 0; i < events.beginCount; i++) {
         b2ContactBeginTouchEvent e = events.beginEvents[i];
 
@@ -90,10 +91,13 @@ void ProcessCollisions() {
         ActorId actorIdA = Uint64ToActorId((uint64_t)b2Body_GetUserData(bodyA));
         ActorId actorIdB = Uint64ToActorId((uint64_t)b2Body_GetUserData(bodyB));
 
-        if (actorIdA.index == UINT32_MAX || actorIdA.generation == UINT32_MAX  ||
+        if (actorIdA.index == UINT32_MAX || actorIdA.generation == UINT32_MAX ||
             actorIdB.index == UINT32_MAX || actorIdB.generation == UINT32_MAX) {
-
-            errorf("Collision with body with non init ActorId");
+            errorf("[event %d] Uninitialised ActorId "
+                   "(idA={%u,%u} idB={%u,%u})",
+                   i,
+                   actorIdA.index, actorIdA.generation,
+                   actorIdB.index, actorIdB.generation);
             continue;
         } 
 
@@ -107,14 +111,24 @@ void ProcessCollisions() {
             errorf("Collision with stray body a: %p, b: %p",a,b);
             continue;
         }
-        if (a->pendingDelete || b->pendingDelete) continue;
+
+        verbose_errf("[event %d] %s(%p) <-> %s(%p)  pendingDelete=(%d,%d)",
+            i,
+            ObjectTypeName(a->getType()), (void*)a,
+            ObjectTypeName(b->getType()), (void*)b, a->pendingDelete, b->pendingDelete);
+
+        if (a->pendingDelete || b->pendingDelete){
+            if(a->pendingDelete) errorf("a pending delete");
+            if(b->pendingDelete) errorf("b pending delete");
+            continue;
+        }
 
 
 #ifdef DEBUG_COLLISIONS
         printf("Collision detected between actor %p and actor %p\n", (void*)a, (void*)b);
 #endif
-        a->onCollision(b);
         b->onCollision(a);
+        a->onCollision(b);
     }
 }
 

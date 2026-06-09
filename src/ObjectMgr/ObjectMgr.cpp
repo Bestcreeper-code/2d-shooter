@@ -1,6 +1,7 @@
 #include "ObjectMgr/ObjectMgr.hpp"
 #include "Object/Object.hpp"
 #include "config.hpp"
+#include "macros.hpp"
 #include "main.hpp"
 #include <cstdint>
 #include <cstdio>
@@ -71,9 +72,11 @@ void StageDelete(ActorId id) {
     if (!actor) return;
     actor->pendingDelete = true;
 
-#ifdef DEBUG_OBJMGR
-    printf("Staged deletion for actor at %p\n", (void*)actor);
-#endif
+    PhysicsObject* phys = dynamic_cast<PhysicsObject*>(actor);
+    verbose_errf("StageDelete: {%u,%u} %p (%s)",
+        id.index, id.generation, (void*)actor,
+        phys ? ObjectTypeName(phys->getType()) : "UI");
+
 }
 
 void RegisterStaged() {
@@ -95,6 +98,7 @@ void RegisterStaged() {
 
         actorSlots[index] = {p.ptr, gen};
         p.ptr->actor_id = *p.id;
+        p.ptr->PreInit();
         p.ptr->Init();
 
 #ifdef DEBUG_OBJMGR
@@ -121,9 +125,10 @@ void RemoveStaged() {
 
         freeList.push_back(i);
 
-#ifdef DEBUG_OBJMGR
-        printf("Deleted actor from slot %u, new generation %u\n", i, slot.generation);
-#endif
+        PhysicsObject* phys = dynamic_cast<PhysicsObject*>(slot.ptr);
+        verbose_errf("RemoveStaged: slot %u gen %u %p (%s)",
+                i, slot.generation, (void*)slot.ptr,
+                phys ? ObjectTypeName(phys->getType()) : "UI");
     }
 }
 
@@ -147,4 +152,45 @@ void ProcessStagedActions() {
 
 uint32_t GetActorCount() {
     return actorSlots.size() - freeList.size();
+}
+
+
+
+void DumpActors() {
+    printf("\e[33m-----ACTOR DUMP (%u actors)\e[0m\n", GetActorCount());
+    for (size_t i = 0; i < actorSlots.size(); i++) {
+        const Slot& slot = actorSlots[i];
+        if (!slot.ptr) {
+            printf("  slot %zu: [empty, gen=%u]\n", i, slot.generation);
+            continue;
+        }
+
+        PhysicsObject* phys = dynamic_cast<PhysicsObject*>(slot.ptr);
+        if (phys) {
+            uint64_t storedUserData = (uint64_t)b2Body_GetUserData(phys->body.bodyId);
+            ActorId storedId = Uint64ToActorId(storedUserData);
+            bool mismatch = storedId.index      != slot.ptr->actor_id.index ||
+                            storedId.generation != slot.ptr->actor_id.generation;
+
+            printf("  slot %zu gen %u | ptr=%p | type=%-14s | actor_id={%u,%u}"
+                   " | b2body.index=%u | body_userdata={%u,%u}%s\n",
+                i, slot.generation,
+                (void*)slot.ptr,
+                
+                ObjectTypeName(phys->getType()),
+                
+                slot.ptr->actor_id.index, slot.ptr->actor_id.generation,
+                
+                phys->body.bodyId.index1,
+                storedId.index, storedId.generation,
+                mismatch ? "  \e[31m<<< MISMATCH\e[0m" : "");
+        } else {
+            printf("  slot %zu gen %u | ptr=%p | type=UI/non-physics"
+                   " | actor_id={%u,%u}\n",
+                i, slot.generation,
+                (void*)slot.ptr,
+                slot.ptr->actor_id.index, slot.ptr->actor_id.generation);
+        }
+    }
+    printf("\e[33m--------END OF DUMP[0m\n");
 }

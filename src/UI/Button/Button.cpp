@@ -71,3 +71,7 @@ void Button::Draw() {
 
     DrawText(text.c_str(), textX, textY, fontSize, currentTextColor);
 }
+
+void Button::SetText(const std::string& new_text) {
+    text = new_text;
+}

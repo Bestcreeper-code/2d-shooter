@@ -8,4 +8,5 @@ class UiActor : public Actor {
 public:
     bool show = true;
     void Init() override {}
+    void PreInit() override {}
 };

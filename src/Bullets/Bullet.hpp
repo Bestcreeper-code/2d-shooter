@@ -26,6 +26,7 @@ class Bullet : public PhysicsObject
         Bullet(bool isPlayerBullet, Vector2 position, float dmg);
         ~Bullet();
 
+        void Init() override{}
         void Update(float deltaTime) override;
         void Draw() override;
         void onCollision(PhysicsObject* other) override;

@@ -27,6 +27,7 @@ public:
     ~TestEnemy();
 
     
+    void Init() override;
     void Draw() override;
     void Update(float deltaTime) override;
     void onCollision(PhysicsObject *other) override;

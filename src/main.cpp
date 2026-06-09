@@ -64,8 +64,8 @@ int main(int argc, char** argv)
     RegisterActor(gameOverScreen);
 
     RegisterActor(new Hud);
+    
     shop = new Shop;
-
     RegisterActor(shop);
 
 
@@ -124,7 +124,11 @@ int main(int argc, char** argv)
             {
                 ImGui::Text("Total Actors Slots: %zu", actorSlots.size());
                 ImGui::Text("Used Actor List Space:");
-                
+
+                if(ImGui::MenuItem("Dump Actors", "", nullptr)) {
+                    DumpActors();
+                }
+
                 ImGui::ProgressBar((float)(GetActorCount() / (float)actorSlots.capacity()), ImVec2(0.0f, 0.0f));
                 ImGui::Text("(%u / %zu)", GetActorCount(), actorSlots.capacity());
                 

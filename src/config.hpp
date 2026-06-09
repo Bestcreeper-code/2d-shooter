@@ -6,10 +6,10 @@
 #define WINDOW_HEIGHT 480
 
 
-#define DEBUG_BUILD
-#define DEBUG_OBJMGR
+// #define DEBUG_BUILD
+// #define DEBUG_OBJMGR
 #define DEBUG_COLLISIONS
-
+#define VERBOSE_ERRORS
 
 #define GAME_KEY_DEBUG_TOGGLE   (KEY_G)
 #define GAME_KEY_IMGUI_TOGGLE   (KEY_I)
