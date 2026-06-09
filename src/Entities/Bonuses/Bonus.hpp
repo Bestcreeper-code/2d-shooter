@@ -5,6 +5,7 @@
 #include "Sprites/Sprite.hpp"
 #include "Textures/TextureCache.hpp"
 #include "box2d/math_functions.h"
+#include "box2d/types.h"
 #include <string>
 
 

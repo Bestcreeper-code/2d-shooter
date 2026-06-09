@@ -3,6 +3,7 @@
 #include "config.hpp"
 #include "macros.hpp"
 #include "main.hpp"
+#include "raylib.h"
 #include <cstdint>
 #include <cstdio>
 #include <climits>
@@ -67,6 +68,9 @@ void UpdateAll() {
         }
     }
 }
+
+
+
 void StageDelete(ActorId id) {
     Actor* actor = GetActor(id);
     if (!actor) return;
@@ -113,9 +117,15 @@ void RegisterStaged() {
 void RemoveStaged() {
     for (uint32_t i = 0; i < actorSlots.size(); i++) {
         Slot& slot = actorSlots[i];
-
+        
         if (!slot.ptr) continue;
         if (!slot.ptr->pendingDelete) continue;
+
+        PhysicsObject* phys = dynamic_cast<PhysicsObject*>(slot.ptr);
+        verbose_errf("RemoveStaged: slot %u gen %u %p (%s)",
+                i, slot.generation, (void*)slot.ptr,
+                phys ? ObjectTypeName(phys->getType()) : "UI/non physicsobj");
+
 
         delete slot.ptr;
         slot.ptr = nullptr;
@@ -125,11 +135,9 @@ void RemoveStaged() {
 
         freeList.push_back(i);
 
-        PhysicsObject* phys = dynamic_cast<PhysicsObject*>(slot.ptr);
-        verbose_errf("RemoveStaged: slot %u gen %u %p (%s)",
-                i, slot.generation, (void*)slot.ptr,
-                phys ? ObjectTypeName(phys->getType()) : "UI");
+        
     }
+    
 }
 
 void DeleteAllActors() {
@@ -185,7 +193,7 @@ void DumpActors() {
                 storedId.index, storedId.generation,
                 mismatch ? "  \e[31m<<< MISMATCH\e[0m" : "");
         } else {
-            printf("  slot %zu gen %u | ptr=%p | type=UI/non-physics"
+            printf("  slot %zu gen %u | ptr=%p | type=UI/non PhysicsObject"
                    " | actor_id={%u,%u}\n",
                 i, slot.generation,
                 (void*)slot.ptr,

@@ -17,8 +17,8 @@ void Hud::Update(float dTime) {
 }
 
 void Hud::Draw() {
-    DrawRectangle(0, 0, WINDOW_WIDTH, 20, LIGHTGRAY);
+    DrawRectangle(0, 0, WINDOW_WIDTH, 30, LIGHTGRAY);
     char buff[32];
     sprintf(buff, "Points: %u", score);
-    DrawText(buff, 0, 0, 15, BLUE);
+    DrawText(buff, 0, 0, 30, BLUE);
 }

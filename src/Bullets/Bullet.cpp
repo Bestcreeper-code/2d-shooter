@@ -5,6 +5,7 @@
 #include "Textures/TextureCache.hpp"
 #include "box2d/box2d.h"
 #include "box2d/math_functions.h"
+#include "box2d/types.h"
 #include "config.hpp"
 #include "macros.hpp"
 #include "main.hpp"
@@ -22,10 +23,11 @@
 Bullet::Bullet(bool isPlayerBullet, Vector2 position, float dmg) : isPlayerBullet(isPlayerBullet), damage(dmg) {
     
     
-    speed = 5.0f;
+    speed = 8.0f;
     sprite.SetTexture(TextureCache::GetTexture(IMG_DIR"Bullet.png"));
     
-    sprite.scale = 0.5f;
+    sprite.scale = 1.0f;
+    
     b2Filter filter;
     filter.categoryBits = isPlayerBullet ? COLLISION_LAYER_PLAYER_BULLET : COLLISION_LAYER_ENEMY_BULLET;
     filter.maskBits = (isPlayerBullet? COLLISION_LAYER_ENEMY : COLLISION_LAYER_PLAYER) | COLLISION_LAYER_GROUND;
@@ -47,7 +49,7 @@ Bullet::Bullet(bool isPlayerBullet, Vector2 position, float dmg) : isPlayerBulle
     b2MassData massData = b2Body_GetMassData(body.bodyId);
     massData.rotationalInertia = 1e38f; 
     b2Body_SetMassData(body.bodyId, massData); 
-    
+    b2Body_SetBullet(body.bodyId, true);
 }
 
 Bullet::~Bullet() {
@@ -55,8 +57,8 @@ Bullet::~Bullet() {
 }
 
 void Bullet::Update(float deltaTime) {
-    
-    b2Vec2 velocity = {0.0f, isPlayerBullet ? -speed : speed};
+    float curr_speed = (speed * deltaTime)*25;
+    b2Vec2 velocity = {0.0f, isPlayerBullet ? -curr_speed : curr_speed};
     b2Body_SetLinearVelocity(body.bodyId, velocity);
 }
 

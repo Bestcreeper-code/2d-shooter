@@ -25,9 +25,11 @@
 #include <cstdint>
 
 
-
+//debug
 bool debug_on = false;
 bool imgui_on = true;
+int fps_cap = 60;
+float crt_warp = 1.0f;
 
 
 uint32_t score;
@@ -37,85 +39,25 @@ EnemySpawner* enemySpawner;
 GameOverScreen* gameOverScreen;
 Shop* shop;
 
-int main(int argc, char** argv)
-{
 
-    InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Game");
-    InitAudioDevice();
-
-    rlImGuiSetup(true);
-
-
-
-    
-    b2WorldDef worldDef = b2DefaultWorldDef();
-    worldDef.gravity = (b2Vec2){0.0f, 0.0f};
-    gWorld = b2CreateWorld(&worldDef);
-
-    B2DebugDraw_Init();
-//world   
-    RegisterActor(new Wall({0,-32}, WINDOW_WIDTH, 33));
-    RegisterActor(new Wall({-32,0}, 33,WINDOW_HEIGHT));
-    RegisterActor(new Wall({WINDOW_WIDTH+32,0}, 33,WINDOW_HEIGHT));
-    RegisterActor(new Wall({0,WINDOW_HEIGHT+32}, WINDOW_WIDTH, 33));
-    
-//UI
-    gameOverScreen = new GameOverScreen();
-    RegisterActor(gameOverScreen);
-
-    RegisterActor(new Hud);
-    
-    shop = new Shop;
-    RegisterActor(shop);
-
-
-//entities
-    player = new Player();
-    RegisterActor(player);
-       
-    enemySpawner = new EnemySpawner((Vector2){10,10},(Vector2){WINDOW_WIDTH - 10,70});
-    RegisterActor(enemySpawner);
-
-    RegisterActor(new HealthPack({200,200}, 25.0f));
-
-
-    ProcessStagedActions();
-
-
-    SetTargetFPS(60);
-
-    
-
-    while (!WindowShouldClose()) {
-
-        if (IsKeyPressed(GAME_KEY_DEBUG_TOGGLE)) {
-            debug_on = !debug_on;
-        } else if (IsKeyPressed(GAME_KEY_IMGUI_TOGGLE)) {
-            imgui_on = !imgui_on;
-        } else if (IsKeyPressed(KEY_P)) {
-            gamePaused = !gamePaused;
-        } else if (IsKeyPressed(KEY_O)) {
-            shop->show = !shop->show;
-        }
-        
-        if (!gamePaused){
-            b2World_Step(gWorld, 1.0f / 60.0f, 4);
-            ProcessCollisions();
-        }
-        
-
-
-        BeginDrawing();
-        ClearBackground(BLACK);
-        rlImGuiBegin();
-
-        
+void RenderImgui() {
+    rlImGuiBegin();
         if (imgui_on && ImGui::Begin("Debug", &imgui_on, ImGuiWindowFlags_AlwaysVerticalScrollbar)) {
             ImGui::SliderInt("Score",(int*)&score,0,100);
             if (ImGui::CollapsingHeader("Actions", ImGuiTreeNodeFlags_DefaultOpen))
             {
                 ImGui::MenuItem("Debug Draw", "G", &debug_on);
                 ImGui::MenuItem("Pause", "", &gamePaused);
+                
+
+                if(ImGui::SliderInt("FPS Cap", &fps_cap,1,500)){
+                    SetTargetFPS(fps_cap);
+                }
+                if(ImGui::SliderFloat("CRT Filter", &crt_warp,0,25)){
+                    SetTargetFPS(fps_cap);
+                }
+
+                
                 ImGui::SliderFloat("Player Health", &player->health, 0.0f, 100.0f);
                 ImGui::SliderFloat("Player Attack Speed", &player->shoot_cooldown, 0.0f, 2.0f);
             }            
@@ -157,19 +99,117 @@ int main(int argc, char** argv)
             }
             ImGui::End();
         }
+    rlImGuiEnd();
+}
+
+
+int main(int argc, char** argv)
+{
+
+    InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Game");
+    InitAudioDevice();
+
+    rlImGuiSetup(true);
+
+
+
+    
+    b2WorldDef worldDef = b2DefaultWorldDef();
+    worldDef.gravity = (b2Vec2){0.0f, 0.0f};
+    worldDef.enableSleep = false;
+    gWorld = b2CreateWorld(&worldDef);
+
+    
+
+    B2DebugDraw_Init();
+//world   
+    RegisterActor(new Wall({0,0}, WINDOW_WIDTH, 33));
+    RegisterActor(new Wall({-32,0}, 33,WINDOW_HEIGHT));
+    RegisterActor(new Wall({WINDOW_WIDTH+32,0}, 33,WINDOW_HEIGHT));
+    RegisterActor(new Wall({0,WINDOW_HEIGHT+32}, WINDOW_WIDTH, 33));
+    
+//UI
+    gameOverScreen = new GameOverScreen();
+    RegisterActor(gameOverScreen);
+
+    RegisterActor(new Hud);
+    
+    shop = new Shop;
+    RegisterActor(shop);
+
+
+//entities
+    player = new Player();
+    RegisterActor(player);
+       
+    enemySpawner = new EnemySpawner((Vector2){10,10},(Vector2){WINDOW_WIDTH - 10,70});
+    RegisterActor(enemySpawner);
+
+    RegisterActor(new HealthPack({200,200}, 25.0f));
+
+
+    ProcessStagedActions();
+
+    SetTargetFPS(fps_cap);
+    
+
+    Shader crt_shader = LoadShader(0, "res/shaders/crt_shader.glsl");
+    RenderTexture2D target = LoadRenderTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
+
+    while (!WindowShouldClose()) {
+
+        if (IsKeyPressed(GAME_KEY_DEBUG_TOGGLE)) {
+            debug_on = !debug_on;
+        } else if (IsKeyPressed(GAME_KEY_IMGUI_TOGGLE)) {
+            imgui_on = !imgui_on;
+        } else if (IsKeyPressed(KEY_P)) {
+            gamePaused = !gamePaused;
+        } else if (IsKeyPressed(KEY_O)) {
+            shop->show = !shop->show;
+        }
+        
+        if (!gamePaused){
+            b2World_Step(gWorld, 1.0f / 60.0f, 4);
+            ProcessCollisions();
+        }
         
 
+        //render start
+        BeginDrawing();
+        ClearBackground(LIGHTGRAY);
+
+        // render Game to texture
+        BeginTextureMode(target);
+        ClearBackground(BLUE);
         
+
+        //updage all 
         UpdateAll();
         
+
+        //debug outlines
         if(debug_on)B2DebugDraw_Draw();
+        EndTextureMode();
         
+        // config shader
+        int warpLoc = GetShaderLocation(crt_shader, "warpStrength");
+        SetShaderValue(crt_shader, warpLoc, &crt_warp, SHADER_UNIFORM_FLOAT);
+        //draw the texture with shaders
+        BeginShaderMode(crt_shader);
+        DrawTextureRec(
+            target.texture,
+            (Rectangle){ 0, 0, WINDOW_WIDTH, -WINDOW_HEIGHT },
+            (Vector2){ 0, 0 },
+            WHITE
+        );
+        EndShaderMode();
 
-
-        rlImGuiEnd();
+        
+        // imgui
+        RenderImgui();
+        
         EndDrawing();
-                
-        
+
         ProcessStagedActions();
     }
 
@@ -181,4 +221,9 @@ int main(int argc, char** argv)
 
     CloseWindow();
     return 0;
+}
+
+void AddScore(int amount) {
+    score+=amount;
+    PlaySound(SoundCache::GetSound("res/snd/point.wav"));
 }

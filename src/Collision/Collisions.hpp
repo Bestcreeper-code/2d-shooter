@@ -2,6 +2,7 @@
 
 #include "box2d/box2d.h"
 #include "box2d/collision.h"
+#include "box2d/types.h"
 
 #define PPM 100.0f //1cm per px
 
@@ -32,6 +33,7 @@ typedef struct BodyResult
 {
     b2BodyId bodyId;
     b2ShapeId shapeId;
+    b2Filter collision_filter;
 } BodyResult;
 
 BodyResult CreateBoxBody( b2WorldId worldId, b2Vec2 position, 

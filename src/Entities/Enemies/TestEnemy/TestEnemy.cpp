@@ -17,7 +17,7 @@
 
 
 TestEnemy::TestEnemy(Vector2 pos) : healthBar(30, 5){
-    speed = 2.0f;
+    speed = 1.0f;
     health= max_health;
     
 
@@ -29,12 +29,16 @@ TestEnemy::TestEnemy(Vector2 pos) : healthBar(30, 5){
     filter.maskBits = COLLISION_LAYER_GROUND | COLLISION_LAYER_PLAYER | COLLISION_LAYER_PLAYER_BULLET;
 
     
-    body = CreateBoxBody(gWorld, {PX_2_M(pos.x), PX_2_M(pos.y) }, PX_2_M(sprite.texture.width)/2,PX_2_M(sprite.texture.height)/2, 1, 1,0, true, filter);
+    body = CreateBoxBody(
+        gWorld, {PX_2_M(pos.x), PX_2_M(pos.y) },
+        PX_2_M(sprite.texture.width)/2,PX_2_M(sprite.texture.height)/2,
+        1, 1,0, true, 
+        filter);
     
     b2MassData massData = b2Body_GetMassData(body.bodyId);
     massData.rotationalInertia = 1e38f; 
     b2Body_SetMassData(body.bodyId, massData); 
-    b2Body_SetBullet(body.bodyId, true);
+    b2Body_SetBullet(body.bodyId, true);//pass through same layer
 }
 
 void TestEnemy::Init(){
@@ -43,7 +47,7 @@ void TestEnemy::Init(){
 
 TestEnemy::~TestEnemy(){
     DestroyBody(body);
-    score++;
+    AddScore(1);
 }
 
 void TestEnemy::Draw() {
@@ -65,7 +69,7 @@ void TestEnemy::Draw() {
 
 void TestEnemy::Update(float deltaTime){
 
-    float delta_time = GetFrameTime();
+    float curr_speed = (speed * deltaTime)*25;
 
     b2Vec2 velocity = {0.0f, 0.0f};
 
@@ -79,10 +83,10 @@ void TestEnemy::Update(float deltaTime){
         time_until_can_shoot = shoot_cooldown;
     }
     
-    velocity.y += 0.25f;
+    velocity.y += curr_speed;
 
     if (time_until_can_shoot > 0.0f) {
-        time_until_can_shoot -= delta_time;
+        time_until_can_shoot -= deltaTime;
     }
     
     
@@ -92,7 +96,6 @@ void TestEnemy::Update(float deltaTime){
 }
 
 void TestEnemy::onCollision(PhysicsObject *other){
-    if(other->getType()!= OBJ_TYPE_ENEMY_BULLET)printf("%s",ObjectTypeName(other->getType()));
     if (other->getType() == ObjectType::OBJ_TYPE_PLAYER_BULLET) {
         health -= ((Bullet*)other)->damage;
         if(health <= 0) {

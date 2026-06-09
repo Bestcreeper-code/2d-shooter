@@ -63,7 +63,7 @@ BodyResult CreateBoxBody(
         b2Body_ApplyMassFromShapes(bodyId);
     }
 
-    BodyResult result = { bodyId, shapeId };
+    BodyResult result = { bodyId, shapeId, collFilter};
     return result;
 }
 

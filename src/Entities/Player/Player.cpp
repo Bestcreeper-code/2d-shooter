@@ -26,7 +26,7 @@
 
 Player::Player() : healthBar(30.0f, 10.0f) {
     
-    speed = 2.0f;
+    speed = 5.0f;
 
     max_health = 100.0f;
     health = 100.0f;
@@ -41,7 +41,11 @@ Player::Player() : healthBar(30.0f, 10.0f) {
     filter.maskBits = COLLISION_LAYER_GROUND | COLLISION_LAYER_ENEMY | COLLISION_LAYER_ENEMY_BULLET
                     | COLLISION_LAYER_PLAYER_BONUS;
     
-    body = CreateBoxBody(gWorld, {3,3}, PX_2_M(sprite.GetFrame(0).width)/2,PX_2_M(sprite.GetFrame(0).height)/2, 1, 1,0, true, filter);
+    body = CreateBoxBody(
+        gWorld, {3,3}, 
+        PX_2_M(sprite.GetFrame(0).width)/2,PX_2_M(sprite.GetFrame(0).height)/2,
+        1, 1,0, true, 
+        filter);
     
     b2MassData massData = b2Body_GetMassData(body.bodyId);
     massData.rotationalInertia = 1e38f; 
@@ -85,9 +89,11 @@ void Player::Init() {
         (uint32_t)(0.3f / player->shoot_cooldown * 10),
         attack_speed_buy, player);
     
-        b2Body_SetUserData(body.bodyId, (void*)(uintptr_t)ActorIdToUint64(this->actor_id));
+    b2Body_SetUserData(body.bodyId, (void*)(uintptr_t)ActorIdToUint64(this->actor_id));
     
+        
 }
+
 
 Player::~Player() {
     DestroyBody(body);
@@ -111,19 +117,19 @@ float time_until_can_shoot = 0.0f;
 void Player::Update(float deltaTime){
     
     b2Vec2 velocity = {0.0f, 0.0f};
-    
+    float curr_speed = (speed * deltaTime)*25;
     was_hit_this_frame = false;
     
 
     if (IsKeyDown(GAME_KEY_RIGHT))
-        velocity.x += speed;
+        velocity.x += curr_speed;
     if (IsKeyDown(GAME_KEY_LEFT))
-        velocity.x -= speed;
+        velocity.x -= curr_speed;
 
     if (IsKeyDown(GAME_KEY_UP))
-        velocity.y -= speed;
+        velocity.y -= curr_speed;
     if (IsKeyDown(GAME_KEY_DOWN))
-        velocity.y += speed;
+        velocity.y += curr_speed;
 
 
     if (IsKeyDown(GAME_KEY_FIRE) && time_until_can_shoot <= 0.0f) {
@@ -138,8 +144,8 @@ void Player::Update(float deltaTime){
     if (velocity.x != 0.0f || velocity.y != 0.0f)
     {
         float length = sqrtf(velocity.x * velocity.x + velocity.y * velocity.y);
-        velocity.x = (velocity.x / length) * speed;
-        velocity.y = (velocity.y / length) * speed;
+        velocity.x = (velocity.x / length) * curr_speed;
+        velocity.y = (velocity.y / length) * curr_speed;
     }
 
     
@@ -166,7 +172,7 @@ void Player::Die(){
 }
 
 void Player::onCollision(PhysicsObject* other) {
-    printf("const char *__restrict format, ...");
+    
     if (other->getType() == ObjectType::OBJ_TYPE_ENEMY_BULLET) {
         Bullet* bullet = static_cast<Bullet*>(other);
         if (!bullet) return;

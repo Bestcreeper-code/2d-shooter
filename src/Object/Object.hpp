@@ -2,6 +2,7 @@
 
 #include "box2d/box2d.h"
 class Actor;
+#define HUD_DRAWING_LAYER (1<<7)
 
 #include "Collision/Collisions.hpp"
 #include "raylib.h"
@@ -51,6 +52,7 @@ class PhysicsObject : public Actor {
         
         void PreInit() override {  
             b2Body_SetUserData(body.bodyId, (void*)(uintptr_t)ActorIdToUint64(this->actor_id));
+            
         }
 
 

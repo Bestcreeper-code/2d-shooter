@@ -45,6 +45,9 @@ extern std::vector<PendingAdd> pendingAdds;
 void RegisterActor(Actor* obj);
 Actor* GetActor(ActorId id);
 void UpdateAll();
+
+void DrawAllGui();
+
 void StageDelete(ActorId id);
 void ProcessStagedActions();
 
