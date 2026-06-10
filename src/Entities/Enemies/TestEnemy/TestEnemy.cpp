@@ -26,7 +26,9 @@ TestEnemy::TestEnemy(Vector2 pos) : healthBar(30, 5){
 
     b2Filter filter;
     filter.categoryBits = COLLISION_LAYER_ENEMY;
-    filter.maskBits = COLLISION_LAYER_GROUND | COLLISION_LAYER_PLAYER | COLLISION_LAYER_PLAYER_BULLET;
+    filter.maskBits = 
+        COLLISION_LAYER_GROUND | COLLISION_LAYER_PLAYER 
+        | COLLISION_LAYER_PLAYER_BULLET;
 
     
     body = CreateBoxBody(

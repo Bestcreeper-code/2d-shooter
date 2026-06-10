@@ -37,7 +37,7 @@ Button::Button(Vector2 pos, float w, float h,
 }
 
 void Button::Update(float dTime) {
-    Vector2 mouse_pos = GetMousePosition();
+    Vector2 mouse_pos = GetWarpedMousePosition();
     bool hovering = CheckCollisionPointRec(mouse_pos, rect);
 
     if (hovering) {

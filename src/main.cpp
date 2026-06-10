@@ -22,15 +22,21 @@
 #include "raylib.h"
 #include "box2d/box2d.h"
 #include "rlImGui.h"
+#include <cstddef>
 #include <cstdint>
+#include <cstdlib>
+#include <random>
 
 
 //debug
 bool debug_on = false;
 bool imgui_on = true;
+
+
 int fps_cap = 60;
 float crt_warp = 1.0f;
 
+bool game_should_end = false;
 
 uint32_t score;
 
@@ -39,6 +45,7 @@ EnemySpawner* enemySpawner;
 GameOverScreen* gameOverScreen;
 Shop* shop;
 
+float game_rect_x, game_rect_y, game_rect_w, game_rect_h;
 
 void RenderImgui() {
     rlImGuiBegin();
@@ -106,12 +113,26 @@ void RenderImgui() {
 int main(int argc, char** argv)
 {
 
+    srand(time(NULL));
+
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Game");
     InitAudioDevice();
 
     rlImGuiSetup(true);
 
 
+
+    
+    // game tex rect 
+    float scale = 0.85f;
+    float w = WINDOW_WIDTH * scale;
+    float h = WINDOW_HEIGHT * scale;
+    float x = (WINDOW_WIDTH - w) * 0.5f;
+    float y = (WINDOW_HEIGHT - h) * 0.5f;
+    game_rect_w = WINDOW_WIDTH  * scale;
+    game_rect_h = WINDOW_HEIGHT * scale;
+    game_rect_x = (WINDOW_WIDTH  - game_rect_w) * 0.5f;
+    game_rect_y = (WINDOW_HEIGHT - game_rect_h) * 0.5f;
 
     
     b2WorldDef worldDef = b2DefaultWorldDef();
@@ -153,11 +174,17 @@ int main(int argc, char** argv)
     SetTargetFPS(fps_cap);
     
 
-    Shader crt_shader = LoadShader(0, "res/shaders/crt_shader.glsl");
-    RenderTexture2D target = LoadRenderTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
+    Shader crt_curve_shader = LoadShader(0, "res/shaders/crt_curve_shader.glsl");
+    Shader curve_shader = LoadShader(0, "res/shaders/curve_shader.glsl");
+    RenderTexture2D gameRenderTexture = LoadRenderTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-    while (!WindowShouldClose()) {
+    RenderTexture2D outlineRenderTexture = LoadRenderTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
+    BeginTextureMode(outlineRenderTexture);
+    ClearBackground(DARKGRAY);
+    EndTextureMode();
 
+    while (!WindowShouldClose() && !game_should_end) {
+        if(game_should_end)break;
         if (IsKeyPressed(GAME_KEY_DEBUG_TOGGLE)) {
             debug_on = !debug_on;
         } else if (IsKeyPressed(GAME_KEY_IMGUI_TOGGLE)) {
@@ -176,10 +203,11 @@ int main(int argc, char** argv)
 
         //render start
         BeginDrawing();
-        ClearBackground(LIGHTGRAY);
+        ClearBackground(BLACK);
 
+        
         // render Game to texture
-        BeginTextureMode(target);
+        BeginTextureMode(gameRenderTexture);
         ClearBackground(BLUE);
         
 
@@ -192,18 +220,39 @@ int main(int argc, char** argv)
         EndTextureMode();
         
         // config shader
-        int warpLoc = GetShaderLocation(crt_shader, "warpStrength");
-        SetShaderValue(crt_shader, warpLoc, &crt_warp, SHADER_UNIFORM_FLOAT);
-        //draw the texture with shaders
-        BeginShaderMode(crt_shader);
-        DrawTextureRec(
-            target.texture,
-            (Rectangle){ 0, 0, WINDOW_WIDTH, -WINDOW_HEIGHT },
-            (Vector2){ 0, 0 },
+        int warpLoc = GetShaderLocation(crt_curve_shader, "warpStrength");
+        SetShaderValue(crt_curve_shader, warpLoc, &crt_warp, SHADER_UNIFORM_FLOAT);
+        
+        int warpLoc2 = GetShaderLocation(curve_shader, "warpStrength");
+        SetShaderValue(curve_shader, warpLoc2, &crt_warp, SHADER_UNIFORM_FLOAT);
+        
+
+
+        // outline rect
+        float padding = 12.0f;
+
+        BeginShaderMode(curve_shader);
+        DrawTexturePro(
+            outlineRenderTexture.texture,
+            (Rectangle){0, 0, WINDOW_WIDTH, -WINDOW_HEIGHT},
+            (Rectangle){x - padding, y - padding, w + padding * 2, h + padding * 2},
+            (Vector2){0, 0},
+            0.0f,
             WHITE
         );
         EndShaderMode();
 
+        // draw the game texture with crt+curve shader
+        BeginShaderMode(crt_curve_shader);
+        DrawTexturePro(
+            gameRenderTexture.texture,
+            (Rectangle){0, 0, WINDOW_WIDTH, -WINDOW_HEIGHT},
+            (Rectangle){x, y, w, h},
+            (Vector2){0, 0},
+            0.0f,
+            WHITE
+        );
+        EndShaderMode();
         
         // imgui
         RenderImgui();
@@ -220,10 +269,25 @@ int main(int argc, char** argv)
     rlImGuiShutdown();
 
     CloseWindow();
-    return 0;
+      return 0;
 }
 
 void AddScore(int amount) {
     score+=amount;
     PlaySound(SoundCache::GetSound("res/snd/point.wav"));
+}
+
+void EndGame() {
+    game_should_end = true;
+}
+
+Vector2 GetWarpedMousePosition() {
+    Vector2 m = GetMousePosition();
+    float u = (m.x - game_rect_x) / game_rect_w * 2.0f - 1.0f;
+    float v = (m.y - game_rect_y) / game_rect_h * 2.0f - 1.0f;
+    float k = crt_warp * 0.1f;
+    float r2 = u*u + v*v;
+    u *= 1.0f + k * r2;
+    v *= 1.0f + k * r2;
+    return { (u * 0.5f + 0.5f) * WINDOW_WIDTH, (v * 0.5f + 0.5f) * WINDOW_HEIGHT };
 }

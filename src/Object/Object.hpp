@@ -51,8 +51,7 @@ class PhysicsObject : public Actor {
     
         
         void PreInit() override {  
-            b2Body_SetUserData(body.bodyId, (void*)(uintptr_t)ActorIdToUint64(this->actor_id));
-            
+            if(b2Body_IsValid(body.bodyId))b2Body_SetUserData(body.bodyId, (void*)(uintptr_t)ActorIdToUint64(this->actor_id));
         }
 
 
