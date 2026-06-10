@@ -104,7 +104,7 @@ void Shop::Draw() {
     float panelX = (WINDOW_WIDTH  - panelW) / 2.0f;
     float panelY = (WINDOW_HEIGHT - panelH) / 2.0f;
 
-    DrawRectangle((int)panelX, (int)panelY, (int)panelW, (int)panelH, Fade(BLACK, 0.85f));
+    DrawRectangle((int)panelX, (int)panelY, (int)panelW, (int)panelH, Fade(BLACK, 0.65f));
     DrawRectangleLines((int)panelX, (int)panelY, (int)panelW, (int)panelH, WHITE);
 
     DrawText("Shop", (int)(panelX + 16), (int)(panelY + 12), 20, WHITE);

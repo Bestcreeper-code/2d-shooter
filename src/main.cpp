@@ -38,6 +38,7 @@ int fps_cap = 60;
 float crt_warp = 1.0f;
 
 bool game_should_end = false;
+bool restart_request = false;
 
 uint32_t score;
 
@@ -56,8 +57,10 @@ void RenderImgui() {
             if (ImGui::CollapsingHeader("Actions", ImGuiTreeNodeFlags_DefaultOpen))
             {
                 ImGui::MenuItem("Debug Draw", "G", &debug_on);
-                ImGui::MenuItem("Pause", "", &gamePaused);
                 
+                if (ImGui::Button("Pause")) Pause();
+                ImGui::SameLine();
+                if (ImGui::Button("Unpause")) ForceUnPause();
 
                 if(ImGui::SliderInt("FPS Cap", &fps_cap,1,500)){
                     SetTargetFPS(fps_cap);
@@ -66,9 +69,10 @@ void RenderImgui() {
                     SetTargetFPS(fps_cap);
                 }
 
-                
-                ImGui::SliderFloat("Player Health", &player->health, 0.0f, 100.0f);
-                ImGui::SliderFloat("Player Attack Speed", &player->GetWeapon(0)->cooldown, 0.0f, 2.0f);
+                if(player){
+                    ImGui::SliderFloat("Player Health", &player->health, 0.0f, 100.0f);
+                    ImGui::SliderFloat("Player Attack Speed", &player->GetWeapon(0)->cooldown, 0.0f, 2.0f);
+                }
             }            
 
             if (ImGui::CollapsingHeader("Object Manager"))
@@ -119,6 +123,7 @@ int main(int argc, char** argv)
 
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Game");
     InitAudioDevice();
+    SetExitKey(KEY_NULL);
 
     rlImGuiSetup(true);
 
@@ -136,6 +141,13 @@ int main(int argc, char** argv)
     game_rect_x = (WINDOW_WIDTH  - game_rect_w) * 0.5f;
     game_rect_y = (WINDOW_HEIGHT - game_rect_h) * 0.5f;
 
+    //shaders
+    Shader crt_curve_shader = LoadShader(0, "res/shaders/crt_curve_shader.glsl");
+    Shader curve_shader = LoadShader(0, "res/shaders/curve_shader.glsl");
+    RenderTexture2D gameRenderTexture = LoadRenderTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
+
+    RenderTexture2D outlineRenderTexture = LoadRenderTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
+
     
     b2WorldDef worldDef = b2DefaultWorldDef();
     worldDef.gravity = (b2Vec2){0.0f, 0.0f};
@@ -143,8 +155,13 @@ int main(int argc, char** argv)
     gWorld = b2CreateWorld(&worldDef);
 
     
+    DebugDraw_Init();
 
-    B2DebugDraw_Init();
+GAME_START:
+    gamePaused = 0;
+    score = 0;
+    game_should_end = false;
+
 //world   
     RegisterActor(new Wall({0,0}, WINDOW_WIDTH, 33));
     RegisterActor(new Wall({-32,0}, 33,WINDOW_HEIGHT));
@@ -176,17 +193,17 @@ int main(int argc, char** argv)
     SetTargetFPS(fps_cap);
     
 
-    Shader crt_curve_shader = LoadShader(0, "res/shaders/crt_curve_shader.glsl");
-    Shader curve_shader = LoadShader(0, "res/shaders/curve_shader.glsl");
-    RenderTexture2D gameRenderTexture = LoadRenderTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
-
-    RenderTexture2D outlineRenderTexture = LoadRenderTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
     BeginTextureMode(outlineRenderTexture);
     ClearBackground(DARKGRAY);
     EndTextureMode();
 
     while (!WindowShouldClose() && !game_should_end) {
-        if(game_should_end)break;
+        if (restart_request) {
+            restart_request = false;
+            DeleteAllActors();
+            goto GAME_START;
+        }
+
         if (IsKeyPressed(GAME_KEY_DEBUG_TOGGLE)) {
             debug_on = !debug_on;
         } else if (IsKeyPressed(GAME_KEY_IMGUI_TOGGLE)) {
@@ -194,7 +211,13 @@ int main(int argc, char** argv)
         } else if (IsKeyPressed(KEY_P)) {
             gamePaused = !gamePaused;
         } else if (IsKeyPressed(KEY_O)) {
-            shop->show = !shop->show;
+            if(shop->show){ 
+                UnPause();
+                shop->show = false;
+            } else {
+                Pause();
+                shop->show = true;
+            }
         }
         
         if (!gamePaused){

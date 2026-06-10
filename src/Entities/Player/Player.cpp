@@ -185,11 +185,9 @@ void Player::Update(float deltaTime) {
 }
 
 void Player::Die(){
-    gamePaused=true;
+    Pause();
     gameOverScreen->show = true;
     enemySpawner->spawning = false;
-    
-    PlaySound(SoundCache::GetSound("res/snd/death_laugh.wav"));
 
     StageDelete(actor_id);
 }

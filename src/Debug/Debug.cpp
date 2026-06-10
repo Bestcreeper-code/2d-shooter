@@ -146,7 +146,7 @@ static void CB_DrawString(b2Vec2 p, const char* s,
 
 static b2DebugDraw s_debugDraw = {};
 
-void B2DebugDraw_Init()
+void DebugDraw_Init()
 {
     s_debugDraw = {};
 

@@ -3,7 +3,7 @@
 #include "box2d/box2d.h"
 #include "raylib.h"
 
-void B2DebugDraw_Init();
+void DebugDraw_Init();
 
 void B2DebugDraw_Draw();
 

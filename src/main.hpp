@@ -18,10 +18,10 @@ enum DrawLayer {
 
     DL_MENUS_BG,
     DL_MENUS_FG,
-    DL_HUD_BG,
-    DL_HUD_FG,
     DL_PAUSE_MENU_BG,
     DL_PAUSE_MENU_FG,
+    DL_HUD_BG,
+    DL_HUD_FG,
     MAX_DRAW_LAYERS
 };
 
@@ -35,6 +35,7 @@ extern Shop* shop;
 
 extern bool shop_on;
 extern bool game_should_end;
+extern bool restart_request;
 
 void AddScore(int amount);
 void EndGame();

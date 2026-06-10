@@ -36,7 +36,7 @@ struct PendingAdd {
     ActorId* id;
 };
 
-extern bool gamePaused;
+extern uint8_t gamePaused;
 
 extern std::vector<Slot>       actorSlots;
 extern std::vector<uint32_t>   freeList;
@@ -69,3 +69,7 @@ static inline const char* ObjectTypeName(ObjectType t) {
         default:                     return "UNKNOWN";
     }
 }
+
+static inline void Pause() {gamePaused++;}
+static inline void UnPause() {if(gamePaused)gamePaused--;}
+static inline void ForceUnPause() {gamePaused=0;}

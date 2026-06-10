@@ -12,7 +12,7 @@
 
 
 
-bool gamePaused = false;
+uint8_t gamePaused = false;
 
 std::vector<Slot>       actorSlots = {};
 std::vector<uint32_t>   freeList   = {};

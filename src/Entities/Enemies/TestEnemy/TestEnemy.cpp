@@ -1,6 +1,7 @@
 #include "Entities/Enemies/TestEnemy/TestEnemy.hpp"
 #include "Bullets/Bullet.hpp"
 #include "Collision/Collisions.hpp"
+#include "Entities/Bonuses/HealthPack.hpp"
 #include "Entities/HealthBar/HealthBar.hpp"
 #include "Object/Object.hpp"
 #include "ObjectMgr/ObjectMgr.hpp"
@@ -14,6 +15,7 @@
 
 #include "main.hpp"
 #include <cstdio>
+#include <cstdlib>
 #include <unistd.h>
 
 
@@ -107,14 +109,22 @@ void TestEnemy::Update(float deltaTime){
 }
 
 void TestEnemy::onCollision(PhysicsObject *other){
+    b2Vec2 p = b2Body_GetPosition(body.bodyId);
     switch (other->getType()) {
     
         case ObjectType::OBJ_TYPE_PLAYER_BULLET: {
             health -= ((Bullet*)other)->damage;
             if(health <= 0) {
                 give_point = true;
+                if((rand()%10)>8)RegisterActor(new HealthPack(Vector2{M_2_PX(p.x),M_2_PX(p.y)}, rand()%20+10));
                 StageDelete(actor_id);
             }
+            break;
+        }
+        case ObjectType::OBJ_TYPE_PLAYER: {
+            give_point = true;
+            StageDelete(actor_id);
+            break;
         }
 
         
