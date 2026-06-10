@@ -14,6 +14,7 @@
 
 #include "main.hpp"
 #include <cstdio>
+#include <unistd.h>
 
 
 TestEnemy::TestEnemy(Vector2 pos) : healthBar(30, 5){
@@ -24,23 +25,23 @@ TestEnemy::TestEnemy(Vector2 pos) : healthBar(30, 5){
     sprite.SetTexture(TextureCache::GetTexture(IMG_DIR"Testenemy.png"));
 
 
-    b2Filter filter;
-    filter.categoryBits = COLLISION_LAYER_ENEMY;
-    filter.maskBits = 
-        COLLISION_LAYER_GROUND | COLLISION_LAYER_PLAYER 
-        | COLLISION_LAYER_PLAYER_BULLET;
+    // b2Filter filter;
+    body.collision_filter.categoryBits = COLLISION_LAYER_ENEMY;
+    // body.collision_filter.groupIndex = -1;
+    body.collision_filter.maskBits = 
+        COLLISION_LAYER_PLAYER | COLLISION_LAYER_PLAYER_BULLET;
 
     
     body = CreateBoxBody(
         gWorld, {PX_2_M(pos.x), PX_2_M(pos.y) },
         PX_2_M(sprite.texture.width)/2,PX_2_M(sprite.texture.height)/2,
         1, 1,0, true, 
-        filter);
+        body.collision_filter);
     
     b2MassData massData = b2Body_GetMassData(body.bodyId);
     massData.rotationalInertia = 1e38f; 
     b2Body_SetMassData(body.bodyId, massData); 
-    b2Body_SetBullet(body.bodyId, true);//pass through same layer
+    // b2Body_SetBullet(body.bodyId, true);//pass through same layer
 }
 
 void TestEnemy::Init(){
@@ -49,7 +50,8 @@ void TestEnemy::Init(){
 
 TestEnemy::~TestEnemy(){
     DestroyBody(body);
-    AddScore(1);
+    
+    if(give_point) AddScore(1);
 }
 
 void TestEnemy::Draw() {
@@ -74,9 +76,9 @@ void TestEnemy::Update(float deltaTime){
     float curr_speed = (speed * deltaTime)*25;
 
     b2Vec2 velocity = {0.0f, 0.0f};
+    b2Transform t = b2Body_GetTransform(body.bodyId);
 
     if (time_until_can_shoot <= 0.0f) {
-        b2Transform t = b2Body_GetTransform(body.bodyId);
 
         Vector2 bulletPos = {M_2_PX(t.p.x), M_2_PX(t.p.y) + 10};
         Bullet* bullet = new Bullet(false, bulletPos, 1.0f);
@@ -91,6 +93,13 @@ void TestEnemy::Update(float deltaTime){
         time_until_can_shoot -= deltaTime;
     }
     
+
+    if(M_2_PX(t.p.y)> WINDOW_HEIGHT + (sprite.texture.height*2)){
+        printf("\e[34m oos death\e[0m");
+        sleep(1);
+        give_point = false;
+        StageDelete(actor_id);
+    }
     
     b2Body_SetLinearVelocity(body.bodyId, velocity);
     
@@ -98,10 +107,19 @@ void TestEnemy::Update(float deltaTime){
 }
 
 void TestEnemy::onCollision(PhysicsObject *other){
-    if (other->getType() == ObjectType::OBJ_TYPE_PLAYER_BULLET) {
-        health -= ((Bullet*)other)->damage;
-        if(health <= 0) {
-            StageDelete(actor_id);
+    switch (other->getType()) {
+    
+        case ObjectType::OBJ_TYPE_PLAYER_BULLET: {
+            health -= ((Bullet*)other)->damage;
+            if(health <= 0) {
+                give_point = true;
+                StageDelete(actor_id);
+            }
         }
+
+        
+
+        default:
+            break;
     }
 }

@@ -6,7 +6,7 @@
 #include "ObjectMgr/ObjectMgr.hpp"
 class EnemySpawner : public Actor {
         float spawnTimer;
-        float spawnInterval = 5.0f; 
+        float spawnInterval = 3.0f; 
         Vector2 spawn_top_left;
         Vector2 spawn_bott_right;
     public:

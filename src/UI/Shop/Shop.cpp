@@ -87,7 +87,7 @@ void Shop::AddItem(const std::string& name,
         Vector2{ x, y },
         btnW, 50,
         rawItem->name,
-        15,
+        25,
         ShopButtonClick,
         nullptr,
         BLUE, DARKBLUE, GREEN, DARKGREEN

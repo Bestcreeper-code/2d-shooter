@@ -8,6 +8,7 @@
 
 class TestEnemy : public PhysicsObject {
     HealthBar healthBar;
+    bool give_point;
 public:
     const ObjectType getType() override {
         return ObjectType::OBJ_TYPE_ENEMY;

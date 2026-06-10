@@ -28,10 +28,10 @@ Bullet::Bullet(bool isPlayerBullet, Vector2 position, float dmg) : isPlayerBulle
     
     sprite.scale = 1.0f;
     
-    b2Filter filter;
-    filter.categoryBits = isPlayerBullet ? COLLISION_LAYER_PLAYER_BULLET : COLLISION_LAYER_ENEMY_BULLET;
-    filter.maskBits = (isPlayerBullet? COLLISION_LAYER_ENEMY : COLLISION_LAYER_PLAYER) | COLLISION_LAYER_GROUND;
-        
+    
+    body.collision_filter.categoryBits = isPlayerBullet ? COLLISION_LAYER_PLAYER_BULLET : COLLISION_LAYER_ENEMY_BULLET;
+    body.collision_filter.maskBits = (isPlayerBullet? COLLISION_LAYER_ENEMY : COLLISION_LAYER_PLAYER) | COLLISION_LAYER_GROUND;
+    body.collision_filter.groupIndex =-1;
 
     
     float halfW = std::max(PX_2_M(sprite.texture.width  * sprite.scale) / 2.0f, 0.01f);
@@ -42,7 +42,7 @@ Bullet::Bullet(bool isPlayerBullet, Vector2 position, float dmg) : isPlayerBulle
         {PX_2_M(position.x), PX_2_M(position.y)},
         halfW, halfH,
         1.0f, 0.3f, 0.8f,
-        true, filter
+        true, body.collision_filter
     );
 
     

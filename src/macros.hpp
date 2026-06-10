@@ -15,3 +15,7 @@
 #else
     #define verbose_errf(frmt,...)
 #endif
+
+
+
+#define DARKERGRAY   CLITERAL(Color){ 60, 60, 60, 255 }

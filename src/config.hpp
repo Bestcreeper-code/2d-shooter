@@ -26,3 +26,5 @@
 #define RES_DIR "res/"
 #define IMG_DIR RES_DIR "img/"
 #define SND_DIR RES_DIR "snd/"
+
+

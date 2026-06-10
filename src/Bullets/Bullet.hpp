@@ -7,9 +7,14 @@
 #include "raylib.h"
 
 
+enum BulletType {
+    BULLET_TYPE_STANDARD,
+    BULLET_TYPE_BIG,
+    
+};
 class Bullet : public PhysicsObject 
 {
-    private:
+    protected:
         bool isPlayerBullet;
         
     public:

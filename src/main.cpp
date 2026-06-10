@@ -6,6 +6,7 @@
 #include "UI/GameOver/GameOver.hpp"
 #include "UI/Hud/Hud.hpp"
 #include "UI/Shop/Shop.hpp"
+#include "macros.hpp"
 #include "osdep.hpp"
 #include "Object/Object.hpp"
 #include "ObjectMgr/ObjectMgr.hpp"
@@ -48,8 +49,9 @@ Shop* shop;
 float game_rect_x, game_rect_y, game_rect_w, game_rect_h;
 
 void RenderImgui() {
+    if(!imgui_on)return;
     rlImGuiBegin();
-        if (imgui_on && ImGui::Begin("Debug", &imgui_on, ImGuiWindowFlags_AlwaysVerticalScrollbar)) {
+        if (ImGui::Begin("Debug", &imgui_on, ImGuiWindowFlags_AlwaysVerticalScrollbar)) {
             ImGui::SliderInt("Score",(int*)&score,0,100);
             if (ImGui::CollapsingHeader("Actions", ImGuiTreeNodeFlags_DefaultOpen))
             {
@@ -60,13 +62,13 @@ void RenderImgui() {
                 if(ImGui::SliderInt("FPS Cap", &fps_cap,1,500)){
                     SetTargetFPS(fps_cap);
                 }
-                if(ImGui::SliderFloat("CRT Filter", &crt_warp,0,25)){
+                if(ImGui::SliderFloat("Curve", &crt_warp,0,25)){
                     SetTargetFPS(fps_cap);
                 }
 
                 
                 ImGui::SliderFloat("Player Health", &player->health, 0.0f, 100.0f);
-                ImGui::SliderFloat("Player Attack Speed", &player->shoot_cooldown, 0.0f, 2.0f);
+                ImGui::SliderFloat("Player Attack Speed", &player->GetWeapon(0)->cooldown, 0.0f, 2.0f);
             }            
 
             if (ImGui::CollapsingHeader("Object Manager"))
@@ -104,8 +106,8 @@ void RenderImgui() {
                 
             
             }
-            ImGui::End();
         }
+        ImGui::End();
     rlImGuiEnd();
 }
 
@@ -228,8 +230,10 @@ int main(int argc, char** argv)
         
 
 
+        
+
         // outline rect
-        float padding = 12.0f;
+        float padding = 22.0f;
 
         BeginShaderMode(curve_shader);
         DrawTexturePro(

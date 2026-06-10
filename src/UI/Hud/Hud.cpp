@@ -17,9 +17,9 @@ Hud::Hud() {
     pausable = false;
     drawing_layer = DL_HUD_BG;
 
-    Button* endBtn = new Button(Vector2{WINDOW_WIDTH-30,0},20,20,
-        "",0,endGameCallback,nullptr,
-    GRAY,DARKGRAY);
+    Button* endBtn = new Button(Vector2{WINDOW_WIDTH-60,4},50,20,
+        "off",20,endGameCallback,nullptr,
+    RED, BROWN, WHITE, LIGHTGRAY);
     
     endBtn->drawing_layer = DL_HUD_FG;
     RegisterActor(endBtn);
@@ -37,4 +37,7 @@ void Hud::Draw() {
     char buff[32];
     sprintf(buff, "Points: %u", score);
     DrawText(buff, 0, 0, 30, BLUE);
+
+
+    DrawRectangle(WINDOW_WIDTH-60,4,55,25, DARKGRAY);
 }
