@@ -7,20 +7,20 @@
 #include <unistd.h>
 
 #include <atomic>
-static std::atomic<size_t> g_myAllocs{0};
+static std::atomic<size_t> g_Allocs{0};
 #ifdef DEBUG_BUILD
 
 void* operator new(size_t size) {
-    g_myAllocs += size;
+    g_Allocs += size;
     return malloc(size);
 }
 void operator delete(void* ptr, size_t size) noexcept {
-    g_myAllocs -= size;
+    g_Allocs -= size;
     free(ptr);
 }
 
 #endif
-size_t GetAllocMemUsage() { return g_myAllocs; }
+size_t GetAllocMemUsage() { return g_Allocs; }
 
 size_t GetTotalSystemMem()
 {
@@ -39,4 +39,4 @@ size_t GetTotalProcessMemUsage()
     file >> size >> resident;
     
     return resident * page_size;
-}// in a debug header somewhere
+}

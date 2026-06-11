@@ -1,0 +1,109 @@
+CXX := clang++
+
+ELF := Game
+OBJ_DIR := build
+
+SYSROOT := $(shell xcrun --sdk macosx --show-sdk-path)
+
+
+ARCH := $(shell uname -m)
+TARGET := -target $(ARCH)-apple-macosx
+
+CXXFLAGS_COMMON := $(TARGET) --sysroot=$(SYSROOT)
+LDFLAGS_COMMON := $(TARGET) --sysroot=$(SYSROOT)
+
+BOX2D_LIB := libs/box2D/build/src/libbox2d.a
+RAYLIB_LIB := build/raylib/libraylib.a
+
+LIBS := $(BOX2D_LIB) $(RAYLIB_LIB) \
+	-framework Cocoa \
+	-framework OpenGL \
+	-framework IOKit \
+	-framework CoreVideo
+
+CXX_SRCS := $(shell find src -name "*.cpp") \
+	libs/imgui/imgui.cpp \
+	libs/imgui/imgui_draw.cpp \
+	libs/imgui/imgui_tables.cpp \
+	libs/imgui/imgui_widgets.cpp \
+	libs/rlImGui/rlImGui.cpp \
+	OS_Dep/MacOS.cpp
+
+CXX_OBJS := $(CXX_SRCS:%.cpp=$(OBJ_DIR)/%.o)
+
+INCLUDES := -Ilibs/box2D/include \
+	-Ilibs/raylib/src \
+	-Ilibs/imgui \
+	-Ilibs/rlImGui \
+	-Isrc -IOS_Dep
+
+
+CXXFLAGS_DEBUG := $(CXXFLAGS_COMMON) -O0 -g -Wall -Werror -fno-omit-frame-pointer
+CXXFLAGS_RELEASE := $(CXXFLAGS_COMMON) -O2 -DNDEBUG \
+	-flto \
+	-fdata-sections -ffunction-sections \
+	-fomit-frame-pointer \
+	-fno-exceptions -fno-rtti
+
+LDFLAGS_DEBUG :=
+LDFLAGS_RELEASE := -flto -Wl,-dead_strip
+
+
+.PHONY: all debug release sanitize clean clean-all
+
+all: debug
+
+
+debug: CXXFLAGS := $(CXXFLAGS_DEBUG)
+debug: LDFLAGS := $(LDFLAGS_DEBUG)
+debug: $(ELF)
+
+
+release: CXXFLAGS := $(CXXFLAGS_RELEASE)
+release: LDFLAGS := $(LDFLAGS_RELEASE)
+release: $(ELF)
+
+
+sanitize: CXXFLAGS := $(CXXFLAGS_DEBUG) -fsanitize=address -fsanitize=undefined -fPIC
+sanitize: LDFLAGS := -fsanitize=address -fsanitize=undefined
+sanitize: $(ELF)
+
+
+$(BOX2D_LIB):
+	@echo "Building Box2D"
+	@(cd libs/box2D && \
+		CC=clang CXX=clang++ \
+		CFLAGS="$(TARGET) --sysroot=$(SYSROOT)" \
+		CXXFLAGS="$(TARGET) --sysroot=$(SYSROOT)" \
+		./build.sh)
+
+
+$(RAYLIB_LIB):
+	@echo "Building Raylib"
+	@mkdir -p build/raylib
+	@(cd build/raylib && cmake ../../libs/raylib \
+		-DCMAKE_C_COMPILER=clang \
+		-DCMAKE_CXX_COMPILER=clang++ \
+		-DCMAKE_C_FLAGS="$(TARGET) --sysroot=$(SYSROOT)" \
+		-DCMAKE_CXX_FLAGS="$(TARGET) --sysroot=$(SYSROOT)" \
+		-DCMAKE_OSX_SYSROOT=$(SYSROOT))
+	@$(MAKE) -C build/raylib -j$(shell sysctl -n hw.logicalcpu)
+
+
+$(ELF): $(BOX2D_LIB) $(RAYLIB_LIB) $(CXX_OBJS)
+	$(CXX) $(LDFLAGS_COMMON) $(LDFLAGS) $(CXX_OBJS) -o $@ $(LIBS)
+
+
+$(OBJ_DIR)/%.o: %.cpp
+	@mkdir -p $(dir $@)
+	@echo "Compiling $<"
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
+
+
+clean:
+	rm -rf $(OBJ_DIR)/src $(ELF)
+
+clean-all: clean
+	rm -rf libs/box2D/build/*
+	rm -rf build/*
+	rm -f $(ELF)

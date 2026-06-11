@@ -98,7 +98,6 @@ void TestEnemy::Update(float deltaTime){
 
     if(M_2_PX(t.p.y)> WINDOW_HEIGHT + (sprite.texture.height*2)){
         printf("\e[34m oos death\e[0m");
-        sleep(1);
         give_point = false;
         StageDelete(actor_id);
     }
@@ -116,7 +115,7 @@ void TestEnemy::onCollision(PhysicsObject *other){
             health -= ((Bullet*)other)->damage;
             if(health <= 0) {
                 give_point = true;
-                if((rand()%10)>8)RegisterActor(new HealthPack(Vector2{M_2_PX(p.x),M_2_PX(p.y)}, rand()%20+10));
+                if((rand()%10)>7)RegisterActor(new HealthPack(Vector2{M_2_PX(p.x),M_2_PX(p.y)}, rand()%15));
                 StageDelete(actor_id);
             }
             break;
