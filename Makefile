@@ -5,9 +5,11 @@ OBJ_DIR := build
 
 BOX2D_LIB := libs/box2D/build/src/libbox2d.a
 
-RAYLIB_LIB := build/raylib/libraylib.a
+RAYLIB_LIB := build/libs/raylib/raylib/libraylib.a
 
-LIBS := $(BOX2D_LIB) $(RAYLIB_LIB) -lGL -lm -lpthread -ldl -lrt -lX11
+JSON_LIB := build/libs/cJSON/libcjson.a
+
+LIBS := $(BOX2D_LIB) $(RAYLIB_LIB) $(JSON_LIB) -lGL -lm -lpthread -ldl -lrt -lX11
 
 
 
@@ -24,6 +26,7 @@ INCLUDES := -Ilibs/box2D/include \
 			-Ilibs/raylib/src \
 			-Ilibs/imgui \
 			-Ilibs/rlImGui \
+			-Ilibs/cJSON \
 			-Isrc -IOS_Dep
 
  
@@ -71,14 +74,22 @@ $(BOX2D_LIB):
 	@(cd libs/box2D && ./build.sh)
 
 $(RAYLIB_LIB):
-
 	@echo "Building Raylib"
-	@(cd build && cmake ../libs/raylib/)
-	@(cd build && make -j4)
+	@mkdir -p build/libs
+	@mkdir -p build/libs/raylib
+	
+	@(cd build/libs/raylib && cmake ../../../libs/raylib/)
+	@(cd build/libs/raylib && make -j4)
+
+$(JSON_LIB):
+	@echo "Building JSON"
+	@mkdir -p build/libs
+	@mkdir -p build/libs/cJSON
+	@(cd libs/cJSON && make && mv libcjson.a ../../build/libs/cJSON/ )
 
 
 
-$(ELF): $(BOX2D_LIB) $(RAYLIB_LIB) $(CXX_OBJS)
+$(ELF): $(BOX2D_LIB) $(RAYLIB_LIB) $(JSON_LIB) $(CXX_OBJS)
 	$(CXX) $(LDFLAGS) $(CXX_OBJS) -o $@ $(LIBS) 
 
 

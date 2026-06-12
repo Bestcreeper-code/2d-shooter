@@ -13,7 +13,7 @@
 #include "box2d/math_functions.h"
 #include "box2d/types.h"
 #include "config.hpp"
-#include "macros.hpp"
+#include "helpers.hpp"
 #include "raylib.h"
 
 #include "main.hpp"
@@ -185,9 +185,9 @@ void Player::Update(float deltaTime) {
 }
 
 void Player::Die(){
+    gEnemySpawner->pausable = true;
     Pause();
     gameOverScreen->show = true;
-    enemySpawner->spawning = false;
 
     StageDelete(actor_id);
 }

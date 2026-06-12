@@ -4,11 +4,14 @@
 #include "Object/Object.hpp"
 #include "Sprites/Sprite.hpp"
 #include "Sprites/AnimatedSprite.hpp"
+#include <cstdint>
 
 
 class TestEnemy : public PhysicsObject {
+private:
     HealthBar healthBar;
     bool give_point;
+    void Die(uint8_t points);
 public:
     const ObjectType getType() override {
         return ObjectType::OBJ_TYPE_ENEMY;

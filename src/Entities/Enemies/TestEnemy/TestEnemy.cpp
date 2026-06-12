@@ -14,6 +14,7 @@
 #include "raylib.h"
 
 #include "main.hpp"
+#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <unistd.h>
@@ -98,8 +99,7 @@ void TestEnemy::Update(float deltaTime){
 
     if(M_2_PX(t.p.y)> WINDOW_HEIGHT + (sprite.texture.height*2)){
         printf("\e[34m oos death\e[0m");
-        give_point = false;
-        StageDelete(actor_id);
+        Die(0);
     }
     
     b2Body_SetLinearVelocity(body.bodyId, velocity);
@@ -114,15 +114,13 @@ void TestEnemy::onCollision(PhysicsObject *other){
         case ObjectType::OBJ_TYPE_PLAYER_BULLET: {
             health -= ((Bullet*)other)->damage;
             if(health <= 0) {
-                give_point = true;
                 if((rand()%10)>7)RegisterActor(new HealthPack(Vector2{M_2_PX(p.x),M_2_PX(p.y)}, rand()%15));
-                StageDelete(actor_id);
+                Die(1);
             }
             break;
         }
         case ObjectType::OBJ_TYPE_PLAYER: {
-            give_point = true;
-            StageDelete(actor_id);
+            Die(2);
             break;
         }
 
@@ -131,4 +129,10 @@ void TestEnemy::onCollision(PhysicsObject *other){
         default:
             break;
     }
+}
+
+void TestEnemy::Die(uint8_t points) {
+    gEnemySpawner->OnEnemyDied();
+    score += points;
+    StageDelete(actor_id);
 }

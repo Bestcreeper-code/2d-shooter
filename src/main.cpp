@@ -3,10 +3,11 @@
 #include "Entities/Bonuses/HealthPack.hpp"
 #include "Entities/Enemies/EnemySpawner.hpp"
 #include "Entities/Enemies/TestEnemy/TestEnemy.hpp"
+#include "Entities/Enemies/WaveDecoder.hpp"
 #include "UI/GameOver/GameOver.hpp"
 #include "UI/Hud/Hud.hpp"
 #include "UI/Shop/Shop.hpp"
-#include "macros.hpp"
+#include "helpers.hpp"
 #include "osdep.hpp"
 #include "Object/Object.hpp"
 #include "ObjectMgr/ObjectMgr.hpp"
@@ -27,6 +28,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <random>
+#include <vector>
 
 
 //debug
@@ -43,7 +45,7 @@ bool restart_request = false;
 uint32_t score;
 
 Player* player;
-EnemySpawner* enemySpawner;
+WaveSpawner* gEnemySpawner;
 GameOverScreen* gameOverScreen;
 Shop* shop;
 
@@ -182,9 +184,12 @@ GAME_START:
     player = new Player();
     RegisterActor(player);
        
-    enemySpawner = new EnemySpawner((Vector2){10,10},(Vector2){WINDOW_WIDTH - 10,70});
-    RegisterActor(enemySpawner);
+    gEnemySpawner = new WaveSpawner(10,WINDOW_WIDTH - 10,70);
+    RegisterActor(gEnemySpawner);
 
+    
+    gEnemySpawner->AddWave(WaveCache::GetWaves("res/waves/wave1.json")[0]);
+    gEnemySpawner->StartWaves();
     RegisterActor(new HealthPack({200,200}, 25.0f));
 
 

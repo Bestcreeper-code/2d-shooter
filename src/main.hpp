@@ -29,7 +29,7 @@ extern uint32_t score;
 
 
 extern Player* player;
-extern EnemySpawner* enemySpawner;
+extern WaveSpawner* gEnemySpawner;
 extern GameOverScreen* gameOverScreen;
 extern Shop* shop;
 

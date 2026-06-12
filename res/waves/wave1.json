@@ -1,0 +1,33 @@
+{
+  "waves": [
+    {
+      "entries": [
+        {
+          "kind": "forced",
+          "delayAfter": 0.0,
+          "formation": [
+            { "type": 0, "xOffset": 0.1,  "delay": 0.0 },
+            { "type": 1, "xOffset": 0.36, "delay": 0.0 },
+            { "type": 0, "xOffset": 0.63, "delay": 0.0 },
+            { "type": 1, "xOffset": 0.9,  "delay": 0.0 },
+
+            { "type": 1, "xOffset": 0.1,  "delay": 2.0 },
+            { "type": 0, "xOffset": 0.36, "delay": 2.0 },
+            { "type": 1, "xOffset": 0.63, "delay": 2.0 },
+            { "type": 0, "xOffset": 0.9,  "delay": 2.0 },
+
+            { "type": 0, "xOffset": 0.1,  "delay": 4.0 },
+            { "type": 1, "xOffset": 0.36, "delay": 4.0, "attrs": {"target_y":300} },
+            { "type": 0, "xOffset": 0.63, "delay": 4.0 },
+            { "type": 1, "xOffset": 0.9,  "delay": 4.0 },
+
+            { "type": 1, "xOffset": 0.1,  "delay": 6.0 },
+            { "type": 0, "xOffset": 0.36, "delay": 6.0 },
+            { "type": 1, "xOffset": 0.63, "delay": 6.0 },
+            { "type": 0, "xOffset": 0.9,  "delay": 6.0 }
+          ]
+        }
+      ]
+    }
+  ]
+}

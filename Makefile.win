@@ -1,13 +1,13 @@
 CXX      := x86_64-w64-mingw32-g++
 ELF      := Game.exe
 OBJ_DIR  := build
-
 SYSROOT  := /usr/x86_64-w64-mingw32
 
 BOX2D_LIB  := libs/box2D/build/src/libbox2d.a
-RAYLIB_LIB := libs/raylib/src/libraylib.a
+RAYLIB_LIB := build/libs/raylib/raylib/libraylib.a
+JSON_LIB   := build/libs/cJSON/libcjson.a
 
-LIBS := $(BOX2D_LIB) $(RAYLIB_LIB) \
+LIBS := $(BOX2D_LIB) $(RAYLIB_LIB) $(JSON_LIB) \
         -static \
         -lgdi32 -lwinmm -lm -lpthread \
         -lstdc++ -lgcc -lgcc_eh -lgcc_s
@@ -23,24 +23,38 @@ CXX_SRCS := $(shell find src -name "*.cpp") \
 CXX_OBJS := $(patsubst %.cpp,$(OBJ_DIR)/%.o,$(CXX_SRCS))
 
 INCLUDES := -Ilibs/box2D/include \
-			-Ilibs/raylib/src \
-			-Ilibs/imgui \
-			-Ilibs/rlImGui \
-			-Isrc -IOS_Dep
+            -Ilibs/raylib/src \
+            -Ilibs/imgui \
+            -Ilibs/rlImGui \
+            -Ilibs/cJSON \
+            -Isrc -IOS_Dep
 
-LDFLAGS := -L$(SYSROOT)/lib
+CXXFLAGS_DEBUG := -O0 -g -Wall -Werror -fno-omit-frame-pointer
+CXXFLAGS_RELEASE := -O2 -DNDEBUG \
+    -flto \
+    -fdata-sections -ffunction-sections \
+    -fomit-frame-pointer \
+    -fno-exceptions -fno-rtti
 
-CXXFLAGS_DEBUG   := -O0 -g -Wall -Werror
-CXXFLAGS_RELEASE := -Os -s -fdata-sections -ffunction-sections -Wall -Werror
+LDFLAGS_DEBUG :=
+LDFLAGS_RELEASE := -flto \
+    -Wl,--gc-sections \
+    -Wl,--strip-all
 
-.PHONY: all debug release clean clean-all
+.PHONY: all debug release sanitize clean clean-all
 
 all: debug
 
-debug:   CXXFLAGS := $(CXXFLAGS_DEBUG)
-debug:   $(ELF)
+debug: CXXFLAGS := $(CXXFLAGS_DEBUG)
+debug: LDFLAGS := $(LDFLAGS_DEBUG)
+debug: $(ELF)
+
+sanitize: CXXFLAGS := $(CXXFLAGS_DEBUG) -fsanitize=address -fsanitize=undefined -fPIC -g
+sanitize: LDFLAGS := $(LDFLAGS_DEBUG) -fsanitize=address -fsanitize=undefined
+sanitize: $(ELF)
 
 release: CXXFLAGS := $(CXXFLAGS_RELEASE)
+release: LDFLAGS := $(LDFLAGS_RELEASE)
 release: $(ELF)
 
 $(BOX2D_LIB):
@@ -62,12 +76,28 @@ $(BOX2D_LIB):
 
 $(RAYLIB_LIB):
 	@echo "Building Raylib (MinGW cross)"
-	$(MAKE) -C libs/raylib/src -j4 \
-	    CC=x86_64-w64-mingw32-gcc \
-	    OS=Windows_NT \
-	    PLATFORM=PLATFORM_DESKTOP
+	@mkdir -p build/libs
+	@mkdir -p build/libs/raylib
+	@(cd build/libs/raylib && cmake ../../../libs/raylib/ \
+	    -DCMAKE_SYSTEM_NAME=Windows \
+	    -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc \
+	    -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++ \
+	    -DCMAKE_RC_COMPILER=x86_64-w64-mingw32-windres \
+	    -DCMAKE_SYSROOT=/usr/x86_64-w64-mingw32 \
+	    -DCMAKE_FIND_ROOT_PATH=/usr/x86_64-w64-mingw32 \
+	    -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY)
+	@(cd build/libs/raylib && make -j4)
 
-$(ELF): $(BOX2D_LIB) $(RAYLIB_LIB) $(CXX_OBJS)
+$(JSON_LIB):
+	@echo "Building JSON (MinGW cross)"
+	@mkdir -p build/libs
+	@mkdir -p build/libs/cJSON
+	@(cd libs/cJSON && \
+	    CC=x86_64-w64-mingw32-gcc \
+	    AR=x86_64-w64-mingw32-ar \
+	    make && mv libcjson.a ../../build/libs/cJSON/)
+
+$(ELF): $(BOX2D_LIB) $(RAYLIB_LIB) $(JSON_LIB) $(CXX_OBJS)
 	$(CXX) $(LDFLAGS) $(CXX_OBJS) -o $@ $(LIBS)
 
 $(OBJ_DIR)/%.o: %.cpp
@@ -76,8 +106,9 @@ $(OBJ_DIR)/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
 clean:
-	rm -rf $(OBJ_DIR) $(ELF)
+	rm -rf $(OBJ_DIR)/src/ $(ELF)
 
 clean-all: clean
-	rm -rf libs/box2D/build
-	$(MAKE) -C libs/raylib/src clean
+	rm -rf libs/box2D/build/*
+	rm -rf $(OBJ_DIR)/* $(ELF)
+	$(MAKE) -C build/libs/raylib clean

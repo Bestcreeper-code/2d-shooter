@@ -1,6 +1,8 @@
 #pragma once
 
 #include "config.hpp"
+#include <string>
+#include <unordered_map>
 
 #ifdef DEBUG_BUILD
 #define errorf(frmt,...) \
@@ -15,6 +17,13 @@
 #else
     #define verbose_errf(frmt,...)
 #endif
+
+
+template <typename K, typename V>
+V strmap_get_or_default(const std::unordered_map<std::string, V>& m, const K& key, const V& def) {
+    auto it = m.find(key);
+    return (it != m.end()) ? it->second : def;
+}
 
 
 

@@ -10,3 +10,6 @@
 [submodule "libs/rlImGui"]
 	path = libs/rlImGui
 	url = https://github.com/raylib-extras/rlImGui.git
+[submodule "libs/cJSON"]
+	path = libs/cJSON
+	url = git@github.com:DaveGamble/cJSON.git
